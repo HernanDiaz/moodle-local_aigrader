@@ -363,11 +363,21 @@ to temporarily revoke the LLM API key.
 
 ---
 
-## Scenario 19: Course backup and restore preserve AI Grader Pro config
+## Scenario 19: Course backup and restore preserve AI Grader Pro data
 
-Verifies that the Backup/Restore API hooks (added in v1.0.26) keep
+Verifies that the Backup/Restore API hooks (rewritten in v1.0.27) keep
 the per-assignment evaluation criteria intact when a course is
-duplicated, restored on the same site, or imported on another site.
+duplicated, restored on the same site, or imported on another site,
+and that backups with user data also carry the AI proposals, teacher
+decisions and audit log.
+
+### Backups of other activities (regression, v1.0.26)
+
+0. In a course with a forum (or any activity that is not an
+   assignment), use *Duplicate* on that activity, then back up the
+   whole course. **Expected**: both complete without errors. v1.0.26
+   failed here with "Call to a member function get_element() on
+   string".
 
 ### Same-site backup → restore
 
@@ -390,6 +400,12 @@ duplicated, restored on the same site, or imported on another site.
 6. Open the new course's AI Grader Pro manage page. **Expected**:
    loads without "AI Grader Pro is not enabled on this
    assignment" error.
+6b. If the backup included user data: **Expected**: the manage page
+   lists the same proposals with the same statuses and grades, the
+   review page shows the teacher's saved drafts, and
+   `mdl_local_aigrader_log` has the audit entries pointing at the
+   restored submissions. Without user data, the list is empty
+   (only the configuration travels).
 
 ### Course duplication (Course reuse → Import)
 
@@ -422,20 +438,23 @@ duplicated, restored on the same site, or imported on another site.
     The assignment is restored without the AI Grader Pro fields,
     as expected.
 
-### Out of scope for v1.0.26
+### Notes
 
-- The student-data tables (`local_aigrader_submission` and
-  `local_aigrader_log`) are NOT backed up in this revision. After
-  restoring, prior grading history is absent — re-running "Grade
-  with AI" on the restored submissions re-creates it. Backup of
-  these tables is planned for v1.0.27.
+- Proposals and audit entries are only restored when their student
+  and submission are restored too (user data included, student
+  enrolled). A teacher missing on the destination site is recorded
+  as user 0 in the audit log, as the privacy provider does.
+- Timestamps of proposals, publications and audit entries are kept
+  as they were; they are not shifted with the course start date.
+- Automated coverage: `tests/backup_restore_test.php`.
 
 ---
 
 ## What is intentionally **not** in this plan
 
-- **Behat coverage**: the plugin ships with PHPUnit tests
-  (`tests/`); a Behat scenario file is on the roadmap for v1.1.
+- **Automated coverage**: the flows above that can run without a
+  real LLM are also covered by PHPUnit (`tests/`) and Behat
+  (`tests/behat/`); this plan is for manual checks on a real site.
 - **Performance / load**: the manage page uses `\table_sql` with
   server-side pagination, so the cohort size has no effect on the
   page render. We have not yet stress-tested 10 K-row cohorts

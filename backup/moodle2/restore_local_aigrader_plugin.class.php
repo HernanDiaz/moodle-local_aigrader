@@ -15,12 +15,17 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Restore hook for AI Grader Pro: re-create the per-assignment
- * configuration row (local_aigrader_assign) when restoring a mod_assign
- * activity that originally had AI Grader Pro enabled.
+ * Restore of AI Grader Pro data written by backup_local_aigrader_plugin.
  *
- * Paired with backup_local_aigrader_plugin. See that file's docblock for
- * scope (config only, no submission/log data in v1.0.26).
+ * module.xml is restored before the activity itself, so while its elements
+ * are processed the new assignment id and the new submission ids do not
+ * exist yet. The rows are therefore collected during processing and written
+ * in after_restore_module(), when the activity and every id mapping
+ * (assignment, submissions, users) are available.
+ *
+ * Historical timestamps (when a proposal was made, when a grade was
+ * published, audit entries) are kept as they were: they record events,
+ * they are not course dates to shift.
  *
  * @package    local_aigrader
  * @copyright  2026 Hernán Díaz
@@ -30,80 +35,165 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Provides the restore steps for local_aigrader when inside a mod_assign
- * restore task.
+ * Provides the restore structure for local_aigrader in module.xml.
  */
 class restore_local_aigrader_plugin extends restore_local_plugin {
+    /** @var stdClass|null Configuration row waiting for the new assignment id. */
+    private ?stdClass $pendingconfig = null;
+
+    /** @var stdClass[] Proposal rows waiting for id mappings. */
+    private array $pendingsubmissions = [];
+
+    /** @var stdClass[] Audit log rows waiting for id mappings. */
+    private array $pendinglogs = [];
+
     /**
-     * Tell the restore engine which XML paths inside the assign module we
-     * care about. For every matching node it finds, it calls the
-     * `process_<element_name>` method with the decoded data.
+     * Paths of AI Grader Pro elements inside module.xml.
      *
-     * @return restore_path_element[] Paths this plugin contributes.
+     * @return restore_path_element[]
      */
     protected function define_module_plugin_structure() {
-        // Only restore inside assign activities — mirrors the backup hook.
-        if ($this->task->get_modulename() !== 'assign') {
-            return [];
+        $paths = [
+            new restore_path_element('aigrader_config', $this->get_pathfor('/aigrader_config')),
+        ];
+        if ($this->get_setting_value('userinfo')) {
+            $paths[] = new restore_path_element(
+                'aigrader_submission',
+                $this->get_pathfor('/aigrader_submissions/aigrader_submission')
+            );
+            $paths[] = new restore_path_element('aigrader_log', $this->get_pathfor('/aigrader_logs/aigrader_log'));
         }
-
-        $paths = [];
-        $paths[] = new restore_path_element(
-            'aigrader_config',
-            $this->get_pathfor('/aigrader_config')
-        );
         return $paths;
     }
 
     /**
-     * Process one `<aigrader_config>` element from the backup XML and
-     * insert it as a fresh row in local_aigrader_assign, bound to the new
-     * assignid that the assign restore task created.
+     * Collect the configuration row.
      *
-     * @param array $data Decoded XML data for the element.
+     * @param array $data Decoded element data.
      */
     public function process_aigrader_config($data) {
+        $this->pendingconfig = (object) $data;
+    }
+
+    /**
+     * Collect one proposal row.
+     *
+     * @param array $data Decoded element data.
+     */
+    public function process_aigrader_submission($data) {
+        $this->pendingsubmissions[] = (object) $data;
+    }
+
+    /**
+     * Collect one audit log row.
+     *
+     * @param array $data Decoded element data.
+     */
+    public function process_aigrader_log($data) {
+        $this->pendinglogs[] = (object) $data;
+    }
+
+    /**
+     * Write the collected rows, now that the assignment and all mappings exist.
+     */
+    public function after_restore_module() {
+        $assignid = (int) $this->task->get_activityid();
+        if (!$assignid) {
+            return;
+        }
+        if ($this->pendingconfig) {
+            $this->restore_config($assignid);
+        }
+        $courseid = (int) $this->task->get_courseid();
+        foreach ($this->pendingsubmissions as $row) {
+            $this->restore_submission($row, $assignid, $courseid);
+        }
+        foreach ($this->pendinglogs as $row) {
+            $this->restore_log($row, $courseid);
+        }
+    }
+
+    /**
+     * Insert (or update) the configuration of the restored assignment.
+     *
+     * @param int $assignid Id of the restored assignment.
+     */
+    private function restore_config(int $assignid): void {
+        global $DB, $USER;
+
+        $record = clone $this->pendingconfig;
+        unset($record->id);
+        $record->assignid = $assignid;
+        // The teacher who last edited the criteria may not exist on this site.
+        $record->usermodified = (int) ($this->get_mappingid('user', $record->usermodified ?? 0) ?: $USER->id);
+
+        $existing = $DB->get_record('local_aigrader_assign', ['assignid' => $assignid]);
+        if ($existing) {
+            $record->id = $existing->id;
+            $DB->update_record('local_aigrader_assign', $record);
+        } else {
+            $DB->insert_record('local_aigrader_assign', $record);
+        }
+    }
+
+    /**
+     * Insert one proposal row, re-pointed at the restored submission and student.
+     *
+     * Rows whose submission or student were not restored are skipped.
+     *
+     * @param stdClass $row Row as read from the backup.
+     * @param int $assignid Id of the restored assignment.
+     * @param int $courseid Id of the course restored into.
+     */
+    private function restore_submission(stdClass $row, int $assignid, int $courseid): void {
         global $DB;
 
-        $data = (object) $data;
-
-        // The original `assignid` from the source site is meaningless on
-        // the destination. Bind to the assign that the restore task is
-        // currently creating.
-        $data->assignid = (int) $this->task->get_activityid();
-
-        // Re-map the teacher who last edited the config. If the user does
-        // not exist on the destination site (cross-site restore without
-        // the user data option), get_mappingid returns false; in that
-        // case we fall back to the user performing the restore.
-        $mappeduser = $this->get_mappingid('user', $data->usermodified ?? 0);
-        if ($mappeduser) {
-            $data->usermodified = (int) $mappeduser;
-        } else {
-            global $USER;
-            $data->usermodified = (int) $USER->id;
+        $submissionid = $this->get_mappingid('submission', $row->submissionid);
+        $studentid = $this->get_mappingid('user', $row->studentid);
+        if (!$submissionid || !$studentid) {
+            return;
         }
-
-        // Shift timestamps according to the restore's date offset (course
-        // start-date moved? these follow).
-        $data->timecreated  = $this->apply_date_offset($data->timecreated ?? 0);
-        $data->timemodified = $this->apply_date_offset($data->timemodified ?? 0);
-
-        // Drop the source-site `id` so DB autoincrement picks a new one.
-        unset($data->id);
-
-        // Defensive guard: if a config already exists for this assignid
-        // (rare but possible when the assign restore handler ran an
-        // assignment-edit-form save that triggered our coursemodule
-        // callbacks before the restore plugin step), update in place
-        // instead of insert.
-        $existing = $DB->get_record('local_aigrader_assign', ['assignid' => $data->assignid]);
-        if ($existing) {
-            $data->id = $existing->id;
-            $DB->update_record('local_aigrader_assign', $data);
+        if ($DB->record_exists('local_aigrader_submission', ['submissionid' => $submissionid])) {
             return;
         }
 
-        $DB->insert_record('local_aigrader_assign', $data);
+        $record = clone $row;
+        unset($record->id);
+        $record->submissionid = $submissionid;
+        $record->assignid = $assignid;
+        $record->courseid = $courseid;
+        $record->studentid = $studentid;
+        $record->final_grader = !empty($row->final_grader)
+            ? ($this->get_mappingid('user', $row->final_grader) ?: null)
+            : null;
+        $DB->insert_record('local_aigrader_submission', $record);
+    }
+
+    /**
+     * Insert one audit log row, re-pointed at the restored submission and users.
+     *
+     * Entries whose submission or student were not restored are skipped. A
+     * teacher who does not exist on this site is recorded as user 0, the same
+     * anonymisation the privacy provider applies.
+     *
+     * @param stdClass $row Row as read from the backup.
+     * @param int $courseid Id of the course restored into.
+     */
+    private function restore_log(stdClass $row, int $courseid): void {
+        global $DB;
+
+        $submissionid = $this->get_mappingid('submission', $row->submissionid);
+        $studentid = $this->get_mappingid('user', $row->studentid);
+        if (!$submissionid || !$studentid) {
+            return;
+        }
+
+        $record = clone $row;
+        unset($record->id);
+        $record->submissionid = $submissionid;
+        $record->studentid = $studentid;
+        $record->userid = (int) ($this->get_mappingid('user', $row->userid) ?: 0);
+        $record->courseid = $courseid;
+        $DB->insert_record('local_aigrader_log', $record);
     }
 }
