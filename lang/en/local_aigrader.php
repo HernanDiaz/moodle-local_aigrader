@@ -125,7 +125,12 @@ $string['review_seen_by_ai_help']         = 'This is the version of the student\
 $string['review_seen_by_ai_size']         = '{$a} KB of text extracted.';
 $string['review_seen_by_ai_warnings']     = 'Notes about the extraction:';
 
-$string['field_finalgrade']         = 'Final grade (0-10)';
+$string['field_finalgrade']         = 'Final grade';
+$string['field_finalgrade_points']  = 'Final grade (out of {$a})';
+$string['field_finalgrade_reference'] = 'Reference grade (0-10, not published)';
+$string['review_advanced_grading']  = 'This assignment uses advanced grading ({$a}). AI Grader Pro cannot fill it in yet, so it cannot publish the grade from here. Use the proposal below as a reference and complete the grading in Moodle\'s grader. You can still save your edits here without publishing.';
+$string['review_open_grader']       = 'Open Moodle\'s grader for this student';
+$string['review_grade_none']        = 'This assignment is set to "No grade": only the feedback will be published to the student.';
 $string['field_strengths']          = 'Strengths';
 $string['field_strengths_hint']     = 'One per line. These will be shown to the student as positive feedback.';
 $string['field_improvements']       = 'Improvements';
@@ -146,7 +151,8 @@ $string['feedback_justification'] = 'Summary';
 
 $string['errornoproposal']      = 'No AI proposal is available for this submission.';
 $string['errorparseproposal']   = 'The stored AI proposal could not be parsed. Try re-grading.';
-$string['errorgradeoutofrange'] = 'The grade must be between 0 and 10 (received: {$a}).';
+$string['errorgradeoutofrange'] = 'The grade must be between {$a->min} and {$a->max} (received: {$a->value}).';
+$string['erroradvancedgrading'] = 'This assignment uses advanced grading (rubric or marking guide), so the grade cannot be published from AI Grader Pro. Grade it in Moodle\'s grader.';
 
 // Privacy provider strings (replaces the v0.1.0 placeholder).
 $string['privacy:metadata'] = 'AI Grader Pro stores AI-assisted grading proposals, audit logs of every grading action, and per-assignment configuration. Personal data is also sent to an external Large Language Model (LLM) provider via Moodle\'s AI Subsystem.';
@@ -283,6 +289,7 @@ $string['bulk_skip_unsupported']       = 'Unsupported file format (upload a vali
 $string['bulk_skip_no_proposal']       = 'No AI proposal (use Grade with AI first)';
 $string['bulk_skip_unknown_state']     = 'Unknown row state';
 $string['bulk_skip_unknown_action']    = 'Unknown action';
+$string['bulk_skip_advanced_grading']  = 'The assignment uses a rubric or marking guide (grade it in Moodle\'s grader)';
 
 // -----------------------------------------------------------------------.
 // Status counter + filter chips (manage page banner).

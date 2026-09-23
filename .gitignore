@@ -31,6 +31,10 @@ package-lock.json
 coverage/
 .phpunit.result.cache
 
+# Generados por admin/tool/phpunit/cli/util.php --buildcomponentconfigs
+phpunit.xml
+tests/phpunit.xml
+
 # Logs y temporales
 *.log
 *.tmp

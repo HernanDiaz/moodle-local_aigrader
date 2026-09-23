@@ -41,7 +41,9 @@
 
 namespace local_aigrader\bulk;
 
+use local_aigrader\grading_scale;
 use local_aigrader\manager;
+use local_aigrader\publisher;
 /**
  * Stateless bulk dispatcher.
  */
@@ -102,21 +104,25 @@ class dispatcher {
      *   - skip:already_published — approve_publish on a row that's already in gradebook
      *   - skip:in_flight         — task is pending; don't touch
      *   - skip:unsupported       — file format prevents AI grading
+     *   - skip:advanced_grading  — approve_publish on an assignment graded with a
+     *                              rubric / marking guide (grade it in Moodle's grader)
      *   - skip:unknown_state     — defensive catch-all for an unrecognised status
      *
      * @param string $action One of self::ALL_ACTIONS.
      * @param object $row A row from the manage.php SQL with at least:
      *                    submissionid, ai_status, proposed_grade.
+     * @param bool $advancedgrading True when the assignment uses a rubric or
+     *                              marking guide, so grades cannot be published from here.
      * @return string self::RESULT_OK or "skip:<reason>".
      */
-    public static function classify(string $action, object $row): string {
+    public static function classify(string $action, object $row, bool $advancedgrading = false): string {
         $status = $row->ai_status ?? null;
 
         switch ($action) {
             case self::ACTION_APPROVE_PUBLISH:
                 // Needs a usable proposal to publish.
                 if ($status === 'ai_proposed' || $status === 'teacher_reviewed') {
-                    return self::RESULT_OK;
+                    return $advancedgrading ? self::RESULT_SKIP_PREFIX . 'advanced_grading' : self::RESULT_OK;
                 }
                 if ($status === 'published') {
                     return self::RESULT_SKIP_PREFIX . 'already_published';
@@ -254,25 +260,18 @@ class dispatcher {
     }
 
     /**
-     * Publish an existing AI proposal as the official grade, with no
-     * teacher edits. Equivalent to opening review.php and clicking
-     * "Aprobar y publicar" without modifying any field.
+     * Publish an existing proposal as the official grade. Equivalent to
+     * opening review.php and clicking "Approve and publish" without
+     * changing any field.
      *
-     * Reuses local_aigrader_publish_grade() from review.php so the same
-     * \assign::save_grade() path is taken — submission_graded event fires,
-     * feedback dispatched to enabled plugins, gradebook entry written by
-     * grader = USER.
+     * For a teacher_reviewed row the teacher's saved draft (final_grade /
+     * final_feedback) is what gets published, not the raw AI proposal —
+     * publishing the proposal would silently discard the teacher's edits.
      *
      * @param int $submissionid The {assign_submission}.id.
      */
     private static function publish_existing_proposal(int $submissionid): void {
-        global $DB, $USER, $CFG;
-
-        require_once($CFG->dirroot . '/local/aigrader/review.php');
-        // review.php declares the helpers as plain functions; including it
-        // for the bare side effect of declaring them is what we want here.
-        // The file's top-level code is gated on require/required_param so it
-        // returns control without rendering anything when called from CLI.
+        global $DB;
 
         $proposalrow = $DB->get_record(
             'local_aigrader_submission',
@@ -289,42 +288,29 @@ class dispatcher {
             throw new \moodle_exception('errorparseproposal', 'local_aigrader');
         }
 
+        $final = $proposed;
+        if ($proposalrow->status === 'teacher_reviewed') {
+            $draft = json_decode((string) $proposalrow->final_feedback, true);
+            if (is_array($draft)) {
+                $final = $draft;
+            }
+            if ($proposalrow->final_grade !== null) {
+                $final['final_grade'] = (float) $proposalrow->final_grade;
+            }
+        }
+
         $assign = $DB->get_record('assign', ['id' => $proposalrow->assignid], '*', MUST_EXIST);
         [$course, $cm] = get_course_and_cm_from_instance($assign->id, 'assign');
         $context = \context_module::instance($cm->id);
 
-        $finalgrade = (float) ($proposed['final_grade'] ?? 0);
-        $strengths     = (array) ($proposed['strengths'] ?? []);
-        $improvements  = (array) ($proposed['improvements'] ?? []);
-        $justification = (string) ($proposed['justification'] ?? '');
-
-        // 1. Update local_aigrader_submission to 'published' with final_feedback
-        // matching the proposal (no edits).
-        $finalfeedback = array_merge($proposed, [
-            'final_grade' => round($finalgrade, 2),
-        ]);
-        $now = time();
-        $DB->update_record('local_aigrader_submission', (object) [
-            'id'             => (int) $proposalrow->id,
-            'status'         => 'published',
-            'final_grade'    => round($finalgrade, 2),
-            'final_feedback' => json_encode($finalfeedback, JSON_UNESCAPED_UNICODE),
-            'final_grader'   => (int) $USER->id,
-            'timemodified'   => $now,
-            'timepublished'  => $now,
-        ]);
-
-        // 2. Push to mod_assign / gradebook through the standard API.
-        local_aigrader_publish_grade(
-            course: $course,
-            cm: $cm,
-            context: $context,
-            studentid: (int) $proposalrow->studentid,
-            grade: $finalgrade,
-            feedbackhtml: local_aigrader_format_feedback_html($strengths, $improvements, $justification)
+        publisher::publish(
+            $proposalrow,
+            $proposed,
+            $final,
+            grading_scale::for_assign($assign, $context),
+            $course,
+            $cm,
+            $context
         );
-
-        // 3. Audit log: this is a bulk "approve" (no edits).
-        local_aigrader_review_log('approve', $proposalrow, $proposed, $finalfeedback);
     }
 }

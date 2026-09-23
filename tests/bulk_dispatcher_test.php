@@ -78,6 +78,23 @@ final class bulk_dispatcher_test extends \basic_testcase {
         );
     }
 
+    /**
+     * With a rubric or marking guide active, publishable rows are skipped.
+     */
+    public function test_approve_publish_skips_under_advanced_grading(): void {
+        foreach (['ai_proposed', 'teacher_reviewed'] as $status) {
+            $this->assertSame(
+                'skip:advanced_grading',
+                dispatcher::classify(dispatcher::ACTION_APPROVE_PUBLISH, $this->row($status, 7.5), true)
+            );
+        }
+        // Grading with AI is unaffected: it never writes the gradebook.
+        $this->assertSame(
+            dispatcher::RESULT_OK,
+            dispatcher::classify(dispatcher::ACTION_GRADE_AI, $this->row('ai_proposed', 7.5), true)
+        );
+    }
+
     public function test_approve_publish_skips_already_published(): void {
         $this->assertSame(
             'skip:already_published',

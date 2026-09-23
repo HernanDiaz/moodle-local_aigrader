@@ -22,8 +22,11 @@
  *     to m_assign_grades with grader=USER. This is the physical guarantee
  *     of human-in-the-loop (per ADR-001 section 3.6): nothing reaches the
  *     gradebook without a teacher's click.
- *   - Reject: the AI proposal is marked as reviewed and ignored; the
- *     teacher will grade manually via Moodle's standard tools.
+ *   - Save without publishing: edits are kept as a draft
+ *     (status teacher_reviewed); nothing reaches the gradebook.
+ *
+ * Grades are stored on the AI's 0-10 scale and shown / entered on the
+ * assignment's own scale (points, Moodle scale); see grading_scale.
  *
  * URL: /local/aigrader/review.php?submissionid=N
  *
@@ -36,6 +39,9 @@ require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/mod/assign/locallib.php');
 require_once($CFG->dirroot . '/mod/assign/lib.php');
 
+use local_aigrader\grading_scale;
+use local_aigrader\publisher;
+
 $submissionid = required_param('submissionid', PARAM_INT);
 
 $assignsub = $DB->get_record('assign_submission', ['id' => $submissionid], '*', MUST_EXIST);
@@ -45,6 +51,8 @@ $context = context_module::instance($cm->id);
 
 require_login($course, false, $cm);
 require_capability('local/aigrader:use', $context);
+
+$scale = grading_scale::for_assign($assign, $context);
 
 $proposalrow = $DB->get_record(
     'local_aigrader_submission',
@@ -107,55 +115,53 @@ $action = optional_param('action', '', PARAM_ALPHAEXT);
 if ($action && data_submitted()) {
     require_sesskey();
 
-    if ($action === 'save_draft') {
-        // "Save without publishing": persist whatever the teacher has typed
-        // into the form as final_grade / final_feedback, flag the row as
-        // teacher_reviewed, and STOP — do not push the grade to the
-        // gradebook. The teacher can come back later, edit further, and
-        // either save another draft or approve & publish.
-        //
-        // Same form-field validation as 'approve' so half-typed grades
-        // out of range are rejected at draft time too. The teacher has
-        // to put SOMETHING numeric in the grade field; if they want to
-        // truly abandon without saving anything, "Atrás" is the right
-        // exit.
-        $finalgrade        = required_param('finalgrade', PARAM_FLOAT);
-        $strengthstext     = required_param('finalstrengths', PARAM_RAW_TRIMMED);
-        $improvementstext  = required_param('finalimprovements', PARAM_RAW_TRIMMED);
-        $justification     = required_param('finaljustification', PARAM_RAW_TRIMMED);
+    if ($action === 'approve' && !$scale->can_publish()) {
+        throw new \moodle_exception('erroradvancedgrading', 'local_aigrader');
+    }
 
-        if ($finalgrade < 0 || $finalgrade > 10) {
-            throw new \moodle_exception('errorgradeoutofrange', 'local_aigrader', '', $finalgrade);
+    // The grade arrives on the assignment's own scale (points or scale item)
+    // and is stored on the AI's 0-10 scale. Out-of-range values are
+    // rejected for drafts too, so a half-typed grade never gets saved.
+    if ($scale->get_type() === grading_scale::TYPE_NONE) {
+        // "No grade" assignments have no grade field; keep the proposal's
+        // value so the audit trail doesn't record a spurious edit.
+        $finalgrade = (float) ($current['final_grade'] ?? $proposed['final_grade'] ?? 0);
+    } else {
+        $enteredgrade = required_param('finalgrade', PARAM_FLOAT);
+        if (!$scale->is_valid_input($enteredgrade)) {
+            throw new \moodle_exception('errorgradeoutofrange', 'local_aigrader', '', (object) [
+                'min'   => format_float($scale->get_input_min(), 2, true, true),
+                'max'   => format_float($scale->get_input_max(), 2, true, true),
+                'value' => s((string) $enteredgrade),
+            ]);
         }
+        $finalgrade = $scale->to_normalized($enteredgrade);
+    }
 
-        $finalstrengths    = local_aigrader_split_lines($strengthstext);
-        $finalimprovements = local_aigrader_split_lines($improvementstext);
+    // Keeps criterion_scores etc. from the original proposal.
+    $finalfeedback = array_merge(is_array($current) ? $current : [], [
+        'final_grade'   => $finalgrade,
+        'strengths'     => publisher::split_lines(required_param('finalstrengths', PARAM_RAW_TRIMMED)),
+        'improvements'  => publisher::split_lines(required_param('finalimprovements', PARAM_RAW_TRIMMED)),
+        'justification' => required_param('finaljustification', PARAM_RAW_TRIMMED),
+    ]);
 
-        $finalfeedback = array_merge(is_array($current) ? $current : [], [
-            'final_grade'    => round((float) $finalgrade, 2),
-            'strengths'      => $finalstrengths,
-            'improvements'   => $finalimprovements,
-            'justification'  => $justification,
-        ]);
-        $finalfeedbackjson = json_encode($finalfeedback, JSON_UNESCAPED_UNICODE);
-
-        $now = time();
+    if ($action === 'save_draft') {
+        // "Save without publishing": persist the teacher's edits as a draft
+        // (teacher_reviewed) and stop — nothing is pushed to the gradebook.
+        // The teacher can come back, edit further, and save again or publish.
         $DB->update_record('local_aigrader_submission', (object) [
             'id'             => $proposalrow->id,
             'status'         => 'teacher_reviewed',
-            'final_grade'    => round((float) $finalgrade, 2),
-            'final_feedback' => $finalfeedbackjson,
+            'final_grade'    => $finalgrade,
+            'final_feedback' => json_encode($finalfeedback, JSON_UNESCAPED_UNICODE),
             'final_grader'   => (int) $USER->id,
-            'timemodified'   => $now,
+            'timemodified'   => time(),
         ]);
 
-        // Audit log: distinct action value 'save_draft' so the trail
-        // can distinguish "teacher edited but didn't publish" from
-        // "teacher rejected the AI proposal outright" (the v1.0.5
-        // behaviour we removed). For AI-Act compliance it matters
-        // whether human review concluded with a published decision or
-        // is still in progress.
-        local_aigrader_review_log('save_draft', $proposalrow, $proposed, $finalfeedback);
+        // Distinct audit action so the trail shows the human review is still
+        // in progress rather than concluded (matters for AI Act record-keeping).
+        publisher::log_review('save_draft', $proposalrow, $proposed, $finalfeedback);
 
         redirect(
             new moodle_url('/local/aigrader/manage.php', ['cmid' => $cm->id]),
@@ -166,65 +172,9 @@ if ($action && data_submitted()) {
     }
 
     if ($action === 'approve') {
-        $finalgrade        = required_param('finalgrade', PARAM_FLOAT);
-        $strengthstext     = required_param('finalstrengths', PARAM_RAW_TRIMMED);
-        $improvementstext  = required_param('finalimprovements', PARAM_RAW_TRIMMED);
-        $justification     = required_param('finaljustification', PARAM_RAW_TRIMMED);
-
-        if ($finalgrade < 0 || $finalgrade > 10) {
-            throw new \moodle_exception('errorgradeoutofrange', 'local_aigrader', '', $finalgrade);
-        }
-
-        $finalstrengths    = local_aigrader_split_lines($strengthstext);
-        $finalimprovements = local_aigrader_split_lines($improvementstext);
-
-        // Build final feedback object (keeps criterion_scores etc. from the original proposal).
-        $finalfeedback = array_merge(is_array($current) ? $current : [], [
-            'final_grade'    => round((float) $finalgrade, 2),
-            'strengths'      => $finalstrengths,
-            'improvements'   => $finalimprovements,
-            'justification'  => $justification,
-        ]);
-        $finalfeedbackjson = json_encode($finalfeedback, JSON_UNESCAPED_UNICODE);
-
-        $now = time();
-
-        // 1. Update local_aigrader_submission.
-        $DB->update_record('local_aigrader_submission', (object) [
-            'id'             => $proposalrow->id,
-            'status'         => 'published',
-            'final_grade'    => round((float) $finalgrade, 2),
-            'final_feedback' => $finalfeedbackjson,
-            'final_grader'   => (int) $USER->id,
-            'timemodified'   => $now,
-            'timepublished'  => $now,
-        ]);
-
-        // 2. Hand the grade off to mod_assign via its public save_grade() API.
-        // The grader column is the TEACHER (USER), never a system id. The
-        // assign instance fires the standard submission_graded event,
-        // delegates feedback to enabled feedback plugins, and pushes the
-        // grade to the gradebook for us.
-        local_aigrader_publish_grade(
-            course: $course,
-            cm: $cm,
-            context: $context,
-            studentid: (int) $proposalrow->studentid,
-            grade: (float) $finalgrade,
-            feedbackhtml: local_aigrader_format_feedback_html(
-                $finalstrengths,
-                $finalimprovements,
-                $justification
-            )
-        );
-
-        // 3. Log the action.
-        local_aigrader_review_log(
-            local_aigrader_diff_action($proposed, $finalfeedback),
-            $proposalrow,
-            $proposed,
-            $finalfeedback
-        );
+        // Writes the gradebook (grader = this teacher, never a system id),
+        // marks the row published and logs the review, in one transaction.
+        publisher::publish($proposalrow, $proposed, $finalfeedback, $scale, $course, $cm, $context);
 
         redirect(
             new moodle_url('/local/aigrader/manage.php', ['cmid' => $cm->id]),
@@ -424,7 +374,7 @@ if (!empty($proposed['criterion_scores']) && is_array($proposed['criterion_score
     echo html_writer::tag('h3', get_string('review_criterion_scores', 'local_aigrader'));
     echo html_writer::start_tag('ul');
     foreach ($proposed['criterion_scores'] as $slug => $score) {
-        $label = local_aigrader_humanize_criterion_slug((string) $slug);
+        $label = publisher::humanize_criterion_slug((string) $slug);
         echo html_writer::tag(
             'li',
             s($label) . ': <strong>' . format_float((float) $score, 2) . '</strong> / 10'
@@ -436,31 +386,82 @@ if (!empty($proposed['criterion_scores']) && is_array($proposed['criterion_score
 // Editable form.
 echo html_writer::tag('h3', get_string('review_proposed', 'local_aigrader'));
 
+$scaletype = $scale->get_type();
+if ($scaletype === grading_scale::TYPE_ADVANCED) {
+    // mod_assign computes the grade from the rubric / marking guide, which
+    // this plugin cannot fill in yet. Send the teacher to the native grader.
+    $graderurl = new moodle_url('/mod/assign/view.php', [
+        'id'     => $cm->id,
+        'action' => 'grader',
+        'userid' => (int) $proposalrow->studentid,
+    ]);
+    echo $OUTPUT->notification(
+        get_string(
+            'review_advanced_grading',
+            'local_aigrader',
+            get_string('pluginname', 'gradingform_' . $scale->get_advanced_method())
+        ) . ' ' . html_writer::link($graderurl, get_string('review_open_grader', 'local_aigrader')),
+        \core\output\notification::NOTIFY_WARNING
+    );
+} else if ($scaletype === grading_scale::TYPE_NONE) {
+    echo $OUTPUT->notification(
+        get_string('review_grade_none', 'local_aigrader'),
+        \core\output\notification::NOTIFY_INFO
+    );
+}
+
 $formurl = $PAGE->url->out(false);
 echo html_writer::start_tag('form', ['method' => 'post', 'action' => $formurl, 'class' => 'mb-4']);
 echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
 
-// Final grade.
-echo html_writer::start_div('mb-3');
-echo html_writer::label(get_string('field_finalgrade', 'local_aigrader'), 'finalgrade', false, ['class' => 'form-label']);
-echo html_writer::empty_tag('input', [
-    'type'  => 'number',
-    'name'  => 'finalgrade',
-    'id'    => 'finalgrade',
-    // Use number_format with explicit "." decimal, NOT format_float:
-    // format_float respects the user's locale (comma in es/fr/de/...) but
-    // HTML <input type="number"> only accepts ASCII dot. With a comma the
-    // browser refuses the value and leaves the field empty, hiding the AI
-    // proposal from the teacher.
-    'value' => number_format((float) $currentgrade, 2, '.', ''),
-    'min'   => 0,
-    'max'   => 10,
-    'step'  => 0.1,
-    'class' => 'form-control',
-    'style' => 'max-width: 120px;',
-    'required' => 'required',
-]);
-echo html_writer::end_div();
+// Final grade, shown and entered on the assignment's own scale.
+if ($scaletype === grading_scale::TYPE_SCALE) {
+    echo html_writer::start_div('mb-3');
+    echo html_writer::label(get_string('field_finalgrade', 'local_aigrader'), 'finalgrade', false, ['class' => 'form-label']);
+    echo html_writer::select(
+        $scale->get_scale_items(),
+        'finalgrade',
+        (int) $scale->to_assign_grade((float) $currentgrade),
+        false,
+        ['id' => 'finalgrade', 'class' => 'form-select', 'style' => 'max-width: 280px;']
+    );
+    echo html_writer::end_div();
+} else if ($scaletype !== grading_scale::TYPE_NONE) {
+    if ($scaletype === grading_scale::TYPE_POINT) {
+        $gradelabel = get_string(
+            'field_finalgrade_points',
+            'local_aigrader',
+            format_float($scale->get_grademax(), 2, true, true)
+        );
+        $gradevalue = (float) $scale->to_assign_grade((float) $currentgrade);
+        $gradestep = 0.01;
+    } else {
+        // Advanced grading: a 0-10 reference value the teacher can keep in the draft.
+        $gradelabel = get_string('field_finalgrade_reference', 'local_aigrader');
+        $gradevalue = (float) $currentgrade;
+        $gradestep = 0.1;
+    }
+    echo html_writer::start_div('mb-3');
+    echo html_writer::label($gradelabel, 'finalgrade', false, ['class' => 'form-label']);
+    echo html_writer::empty_tag('input', [
+        'type'  => 'number',
+        'name'  => 'finalgrade',
+        'id'    => 'finalgrade',
+        // Use number_format with explicit "." decimal, NOT format_float:
+        // format_float respects the user's locale (comma in es/fr/de/...) but
+        // HTML <input type="number"> only accepts ASCII dot. With a comma the
+        // browser refuses the value and leaves the field empty, hiding the AI
+        // proposal from the teacher.
+        'value' => number_format($gradevalue, 2, '.', ''),
+        'min'   => number_format($scale->get_input_min(), 2, '.', ''),
+        'max'   => number_format($scale->get_input_max(), 2, '.', ''),
+        'step'  => $gradestep,
+        'class' => 'form-control',
+        'style' => 'max-width: 120px;',
+        'required' => 'required',
+    ]);
+    echo html_writer::end_div();
+}
 
 // Strengths.
 echo html_writer::start_div('mb-3');
@@ -502,11 +503,13 @@ echo html_writer::end_div();
 // Action buttons. Using <button> so we can have nice display text while
 // posting value="approve"/"reject" for the handler.
 echo html_writer::start_div('d-flex gap-2');
-echo html_writer::tag(
-    'button',
-    get_string('btn_approve_publish', 'local_aigrader'),
-    ['type' => 'submit', 'name' => 'action', 'value' => 'approve', 'class' => 'btn btn-success']
-);
+if ($scale->can_publish()) {
+    echo html_writer::tag(
+        'button',
+        get_string('btn_approve_publish', 'local_aigrader'),
+        ['type' => 'submit', 'name' => 'action', 'value' => 'approve', 'class' => 'btn btn-success']
+    );
+}
 // "Save without publishing": neutral secondary style (not red/danger as
 // in v1.0.x — saving a draft is non-destructive) and no JS confirm()
 // since pressing the wrong button is recoverable (the teacher can
@@ -563,217 +566,3 @@ if ($meta) {
 }
 
 echo $OUTPUT->footer();
-
-// ---------------------------------------------------------------------.
-// Helpers.
-// ---------------------------------------------------------------------.
-
-/**
- * Split a textarea value (one item per line) into a clean array.
- *
- * @param string $text Raw textarea content.
- * @return array Trimmed, non-empty lines as a re-indexed array of strings.
- */
-function local_aigrader_split_lines(string $text): array {
-    $parts = preg_split('/\r?\n/', $text);
-    $parts = array_map('trim', $parts);
-    $parts = array_filter($parts, fn($s) => $s !== '');
-    return array_values($parts);
-}
-
-/**
- * Turn a criterion slug from the LLM ("configuracion_y_justificacion_...")
- * into a human-readable label ("Configuracion y justificacion ..."). The
- * slug is ASCII snake_case by design (the LLM is instructed to emit
- * machine-safe identifiers so the PHP parser does not trip on accents),
- * so the transform is straightforward: replace underscores with spaces,
- * uppercase the first letter, leave the rest as-is.
- *
- * Defensive against empty / whitespace-only input.
- *
- * @param string $slug Snake_case slug from the LLM's `criterion_scores` keys.
- * @return string Human-readable label, or '' for empty input.
- */
-function local_aigrader_humanize_criterion_slug(string $slug): string {
-    $clean = trim($slug);
-    if ($clean === '') {
-        return '';
-    }
-    return ucfirst(str_replace('_', ' ', $clean));
-}
-
-/**
- * Build the HTML feedback shown to the student in the gradebook.
- * Per ADR-001 section 8.2 the student does not see IA branding by default;
- * the teacher takes pedagogical and legal ownership of the feedback.
- *
- * @param array $strengths Bullet points to surface under "Aciertos".
- * @param array $improvements Bullet points to surface under "Mejorables".
- * @param string $justification Free-text justification appended at the end.
- * @return string HTML safe to store in `assign_grades.feedback` /
- *                `assignfeedback_comments.commenttext`.
- */
-function local_aigrader_format_feedback_html(array $strengths, array $improvements, string $justification): string {
-    $html = '';
-    if ($strengths) {
-        $html .= html_writer::tag('p', html_writer::tag('strong', get_string('feedback_strengths', 'local_aigrader')));
-        $html .= html_writer::start_tag('ul');
-        foreach ($strengths as $s) {
-            $html .= html_writer::tag('li', s($s));
-        }
-        $html .= html_writer::end_tag('ul');
-    }
-    if ($improvements) {
-        $html .= html_writer::tag('p', html_writer::tag('strong', get_string('feedback_improvements', 'local_aigrader')));
-        $html .= html_writer::start_tag('ul');
-        foreach ($improvements as $i) {
-            $html .= html_writer::tag('li', s($i));
-        }
-        $html .= html_writer::end_tag('ul');
-    }
-    if (trim($justification) !== '') {
-        $html .= html_writer::tag('p', html_writer::tag('strong', get_string('feedback_justification', 'local_aigrader')));
-        $html .= html_writer::tag('p', nl2br(s($justification)));
-    }
-    return $html;
-}
-
-/**
- * Publish the approved grade and feedback through mod_assign's public
- * save_grade() API.
- *
- * Replaces the previous direct DML on {assign_grades} +
- * {assignfeedback_comments} + grade_update() with a single
- * \assign::save_grade($studentid, $data) call. The benefit:
- *
- *   - {assign_grades} row written with grader = USER->id, timemodified,
- *     etc., consistent with how the standard grading UI does it.
- *   - The submission_graded event fires, so completion tracking,
- *     notifications, and other Moodle observers react correctly.
- *   - Feedback is dispatched to whichever feedback plugins are enabled
- *     on the assignment (typically assignfeedback_comments). Plugins
- *     that are disabled silently ignore our $data.
- *   - The grade is pushed to the gradebook via the standard path —
- *     no separate grade_update() call needed.
- *
- * Returns the {assign_grades}.id of the row that was created or updated,
- * for downstream audit logging.
- *
- * @param \stdClass $course Course record.
- * @param \stdClass $cm Course module record (cm_info or stdClass both work).
- * @param \context_module $context Module context.
- * @param int $studentid Id of the student being graded.
- * @param float $grade Final grade on the assignment's scale (typically 0-10).
- * @param string $feedbackhtml HTML feedback shown in the student's gradebook view.
- * @return int Id of the {assign_grades} row.
- */
-function local_aigrader_publish_grade(
-    \stdClass $course,
-    $cm,
-    \context_module $context,
-    int $studentid,
-    float $grade,
-    string $feedbackhtml
-): int {
-    global $DB, $CFG;
-    require_once($CFG->dirroot . '/mod/assign/locallib.php');
-
-    $assigninstance = new \assign($context, $cm, $course);
-
-    // Build the form-data shape that \assign::save_grade() expects.
-    $data = new \stdClass();
-    // -1 == "current attempt of the student". This is the same convention
-    // mod_assign's own grading UI passes in.
-    $data->attemptnumber = -1;
-    $data->grade         = $grade;
-    // The plugin manages its own student notifications. Don't double-notify.
-    $data->sendstudentnotifications = false;
-
-    // Attach the feedback if the comments feedback plugin is enabled on
-    // this assignment. If it isn't, save_grade() ignores the field and
-    // the feedback still appears in the gradebook via the grade item.
-    $commentsplugin = $assigninstance->get_feedback_plugin_by_type('comments');
-    if ($commentsplugin && $commentsplugin->is_enabled() && $commentsplugin->is_visible()) {
-        $data->assignfeedbackcomments_editor = [
-            'text'   => $feedbackhtml,
-            'format' => FORMAT_HTML,
-        ];
-    }
-
-    $assigninstance->save_grade($studentid, $data);
-
-    // Re-read the freshly written {assign_grades} row id for the caller's
-    // audit log. assign::save_grade() does not return it directly.
-    $graderow = $DB->get_record(
-        'assign_grades',
-        ['assignment' => $assigninstance->get_instance()->id, 'userid' => $studentid],
-        'id, timemodified',
-        IGNORE_MULTIPLE  // Tolerate multiple attempts; we just need one id.
-    );
-    return $graderow ? (int) $graderow->id : 0;
-}
-
-/**
- * Decide whether the teacher made meaningful changes to the AI proposal,
- * for logging purposes (action='edit' vs 'approve').
- *
- * @param array $proposed Original AI proposal payload.
- * @param array $final Final form values the teacher submitted.
- * @return string 'edit' if anything material changed, 'approve' otherwise.
- */
-function local_aigrader_diff_action(array $proposed, array $final): string {
-    if (round((float) ($proposed['final_grade'] ?? 0), 2) !== round((float) ($final['final_grade'] ?? 0), 2)) {
-        return 'edit';
-    }
-    foreach (['strengths', 'improvements'] as $k) {
-        if (($proposed[$k] ?? []) !== ($final[$k] ?? [])) {
-            return 'edit';
-        }
-    }
-    if (trim((string) ($proposed['justification'] ?? '')) !== trim((string) ($final['justification'] ?? ''))) {
-        return 'edit';
-    }
-    return 'approve';
-}
-
-/**
- * Write an entry to local_aigrader_log for a teacher review action.
- *
- * @param string $action Audit action: 'approve', 'edit', 'save_draft', 'reject'.
- * @param \stdClass $proposalrow Existing local_aigrader_submission row.
- * @param array|null $proposed Original AI proposal (used to compute the edit diff).
- * @param array|null $final Final values the teacher published / saved (null on reject).
- */
-function local_aigrader_review_log(string $action, \stdClass $proposalrow, ?array $proposed, ?array $final): void {
-    global $DB, $USER;
-
-    $rec = (object) [
-        'submissionid'      => (int) $proposalrow->submissionid,
-        'userid'            => (int) $USER->id,
-        'studentid'         => (int) $proposalrow->studentid,
-        'courseid'          => (int) $proposalrow->courseid,
-        'action'            => $action,
-        'llm_provider'      => null,
-        'llm_model'         => null,
-        'prompt_hash'       => null,
-        'prompt_text'       => null,
-        'response_json'     => $final ? json_encode($final, JSON_UNESCAPED_UNICODE) : null,
-        'tokens_input'      => null,
-        'tokens_output'     => null,
-        'cost_usd'          => null,
-        'duration_ms'       => null,
-        'proposed_grade'    => $proposed['final_grade'] ?? null,
-        'final_grade'       => $final['final_grade'] ?? null,
-        'teacher_edits'     => ($action === 'edit' && $proposed && $final)
-            ? json_encode([
-                'grade'         => [$proposed['final_grade'] ?? null, $final['final_grade'] ?? null],
-                'strengths'     => [$proposed['strengths'] ?? [], $final['strengths'] ?? []],
-                'improvements'  => [$proposed['improvements'] ?? [], $final['improvements'] ?? []],
-                'justification' => [$proposed['justification'] ?? '', $final['justification'] ?? ''],
-            ], JSON_UNESCAPED_UNICODE)
-            : null,
-        'submission_format' => null,
-        'timecreated'       => time(),
-    ];
-    $DB->insert_record('local_aigrader_log', $rec);
-}

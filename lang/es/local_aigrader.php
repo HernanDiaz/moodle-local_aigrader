@@ -125,7 +125,12 @@ $string['review_seen_by_ai_help']         = 'Esta es la versión que la IA leyó
 $string['review_seen_by_ai_size']         = '{$a} KB de texto extraídos.';
 $string['review_seen_by_ai_warnings']     = 'Avisos sobre la extracción:';
 
-$string['field_finalgrade']         = 'Nota final (0-10)';
+$string['field_finalgrade']         = 'Nota final';
+$string['field_finalgrade_points']  = 'Nota final (sobre {$a})';
+$string['field_finalgrade_reference'] = 'Nota orientativa (0-10, no se publica)';
+$string['review_advanced_grading']  = 'Esta tarea usa calificación avanzada ({$a}). AI Grader Pro todavía no puede rellenarla, así que no puede publicar la nota desde aquí. Usa la propuesta como referencia y completa la calificación en el calificador de Moodle. Puedes guardar tus cambios aquí sin publicar.';
+$string['review_open_grader']       = 'Abrir el calificador de Moodle para este alumno';
+$string['review_grade_none']        = 'Esta tarea está configurada sin calificación: solo se publicará el feedback al alumno.';
 $string['field_strengths']          = 'Aciertos';
 $string['field_strengths_hint']     = 'Uno por linea. Se mostrara al alumno como feedback positivo.';
 $string['field_improvements']       = 'Mejorables';
@@ -146,7 +151,8 @@ $string['feedback_justification'] = 'Resumen';
 
 $string['errornoproposal']      = 'No hay propuesta IA disponible para esta entrega.';
 $string['errorparseproposal']   = 'La propuesta IA guardada no se ha podido leer. Recalifica para regenerarla.';
-$string['errorgradeoutofrange'] = 'La nota debe estar entre 0 y 10 (recibido: {$a}).';
+$string['errorgradeoutofrange'] = 'La nota debe estar entre {$a->min} y {$a->max} (recibido: {$a->value}).';
+$string['erroradvancedgrading'] = 'Esta tarea usa calificación avanzada (rúbrica o guía de evaluación), así que la nota no se puede publicar desde AI Grader Pro. Califícala en el calificador de Moodle.';
 
 // Strings del Privacy provider (reemplazan el placeholder de v0.1.0).
 $string['privacy:metadata'] = 'AI Grader Pro almacena propuestas de calificacion generadas por IA, registros de auditoria de cada accion, y configuracion por tarea. Tambien se envian datos personales a un proveedor LLM externo via el AI Subsystem de Moodle.';
@@ -283,6 +289,7 @@ $string['bulk_skip_unsupported']       = 'Formato no soportado (sube archivo vá
 $string['bulk_skip_no_proposal']       = 'Sin propuesta IA (usa Calificar con IA primero)';
 $string['bulk_skip_unknown_state']     = 'Estado desconocido en la fila';
 $string['bulk_skip_unknown_action']    = 'Acción desconocida';
+$string['bulk_skip_advanced_grading']  = 'La tarea usa rúbrica o guía de evaluación (califícala en el calificador de Moodle)';
 
 // -----------------------------------------------------------------------.
 // Status counter + filter chips (manage page banner).

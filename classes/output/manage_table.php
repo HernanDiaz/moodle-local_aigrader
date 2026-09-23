@@ -54,6 +54,7 @@ require_once($CFG->libdir . '/tablelib.php');
 
 use html_writer;
 use local_aigrader\error_classifier;
+use local_aigrader\grading_scale;
 use moodle_url;
 use stdClass;
 
@@ -69,13 +70,22 @@ class manage_table extends \table_sql {
     private int $cmid;
 
     /**
+     * Grading configuration of the assignment, used to show grades on its own scale.
+     *
+     * @var grading_scale
+     */
+    private grading_scale $scale;
+
+    /**
      * Build the manage page table bound to a specific assignment by its cmid.
      *
      * @param int $cmid Course module id of the assignment being managed.
+     * @param grading_scale $scale Grading configuration of that assignment.
      */
-    public function __construct(int $cmid) {
+    public function __construct(int $cmid, grading_scale $scale) {
         parent::__construct('local-aigrader-manage');
         $this->cmid = $cmid;
+        $this->scale = $scale;
 
         $this->define_columns([
             'checkbox', 'student', 'submitted_at', 'status', 'grade', 'action',
@@ -193,14 +203,14 @@ class manage_table extends \table_sql {
     }
 
     /**
-     * Render the proposed grade (or final grade for published rows).
+     * Render the AI's proposed grade on the assignment's own scale.
      *
      * @param stdClass $row
      * @return string
      */
     public function col_grade($row): string {
         return $row->proposed_grade !== null
-            ? format_float($row->proposed_grade, 2) . ' / 10'
+            ? s($this->scale->format((float) $row->proposed_grade))
             : '-';
     }
 

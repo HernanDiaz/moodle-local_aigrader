@@ -436,7 +436,7 @@ echo html_writer::end_tag('form');
 // -------------------------------------------------------------------.
 // The table itself.
 // -------------------------------------------------------------------.
-$table = new manage_table($cmid);
+$table = new manage_table($cmid, \local_aigrader\grading_scale::for_assign($assign, $context));
 $table->define_baseurl($pageurl);
 
 // SQL pieces. Note: table_sql appends its own ORDER BY (via the

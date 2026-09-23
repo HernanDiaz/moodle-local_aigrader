@@ -123,7 +123,12 @@ $string['review_seen_by_ai_help']         = 'Voici la version que l\'IA a lue du
 $string['review_seen_by_ai_size']         = '{$a} KB de texte extraits.';
 $string['review_seen_by_ai_warnings']     = 'Avertissements concernant l\'extraction :';
 
-$string['field_finalgrade']         = 'Note finale (0-10)';
+$string['field_finalgrade']         = 'Note finale';
+$string['field_finalgrade_points']  = 'Note finale (sur {$a})';
+$string['field_finalgrade_reference'] = 'Note indicative (0-10, non publiée)';
+$string['review_advanced_grading']  = 'Ce devoir utilise une évaluation avancée ({$a}). AI Grader Pro ne sait pas encore la remplir, il ne peut donc pas publier la note depuis cette page. Utilisez la proposition comme référence et terminez l\'évaluation dans l\'interface d\'évaluation de Moodle. Vous pouvez toujours enregistrer vos modifications ici sans publier.';
+$string['review_open_grader']       = 'Ouvrir l\'interface d\'évaluation de Moodle pour cet étudiant';
+$string['review_grade_none']        = 'Ce devoir est configuré sans note : seul le feedback sera publié à l\'étudiant.';
 $string['field_strengths']          = 'Points forts';
 $string['field_strengths_hint']     = 'Un par ligne. Sera affiché à l\'étudiant comme feedback positif.';
 $string['field_improvements']       = 'À améliorer';
@@ -144,7 +149,8 @@ $string['feedback_justification'] = 'Résumé';
 
 $string['errornoproposal']      = 'Aucune proposition IA disponible pour cette remise.';
 $string['errorparseproposal']   = 'La proposition IA enregistrée n\'a pas pu être lue. Ré-évaluez pour la régénérer.';
-$string['errorgradeoutofrange'] = 'La note doit être comprise entre 0 et 10 (reçu : {$a}).';
+$string['errorgradeoutofrange'] = 'La note doit être comprise entre {$a->min} et {$a->max} (reçu : {$a->value}).';
+$string['erroradvancedgrading'] = 'Ce devoir utilise une évaluation avancée (grille ou guide d\'évaluation) : la note ne peut pas être publiée depuis AI Grader Pro. Évaluez-le dans l\'interface d\'évaluation de Moodle.';
 
 // Strings du Privacy provider.
 $string['privacy:metadata'] = 'AI Grader Pro stocke les propositions d\'évaluation générées par IA, les journaux d\'audit de chaque action et la configuration par devoir. Il envoie également des données personnelles à un fournisseur LLM externe via l\'AI Subsystem de Moodle.';
@@ -281,6 +287,7 @@ $string['bulk_skip_unsupported']       = 'Format non pris en charge (envoyez d\'
 $string['bulk_skip_no_proposal']       = 'Sans proposition IA (utilisez d\'abord Évaluer avec l\'IA)';
 $string['bulk_skip_unknown_state']     = 'État inconnu de la ligne';
 $string['bulk_skip_unknown_action']    = 'Action inconnue';
+$string['bulk_skip_advanced_grading']  = 'Le devoir utilise une grille ou un guide d\'évaluation (évaluez-le dans l\'interface d\'évaluation de Moodle)';
 
 // -----------------------------------------------------------------------.
 // Status counter + filter chips (manage page banner).

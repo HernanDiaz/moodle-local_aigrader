@@ -92,9 +92,13 @@ foreach ($rows as $r) {
 
 // Classify each row up front so both the confirmation page and the executor
 // see exactly the same eligibility verdicts.
+// With a rubric / marking guide active, grades cannot be published from
+// here; classify() turns every approve_publish row into a skip.
+$advancedgrading = !\local_aigrader\grading_scale::for_assign($assign, $context)->can_publish();
+
 $applicable = [];
 foreach ($rowsbyid as $sid => $row) {
-    $applicable[$sid] = dispatcher::classify($action, $row);
+    $applicable[$sid] = dispatcher::classify($action, $row, $advancedgrading);
 }
 
 $okcount = 0;

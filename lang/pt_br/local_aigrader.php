@@ -123,7 +123,12 @@ $string['review_seen_by_ai_help']         = 'Esta é a versão que a IA leu do a
 $string['review_seen_by_ai_size']         = '{$a} KB de texto extraídos.';
 $string['review_seen_by_ai_warnings']     = 'Avisos sobre a extração:';
 
-$string['field_finalgrade']         = 'Nota final (0-10)';
+$string['field_finalgrade']         = 'Nota final';
+$string['field_finalgrade_points']  = 'Nota final (máximo {$a})';
+$string['field_finalgrade_reference'] = 'Nota de referência (0-10, não publicada)';
+$string['review_advanced_grading']  = 'Esta tarefa usa avaliação avançada ({$a}). O AI Grader Pro ainda não consegue preenchê-la, então não pode publicar a nota daqui. Use a proposta como referência e conclua a avaliação no avaliador do Moodle. Você ainda pode salvar suas alterações aqui sem publicar.';
+$string['review_open_grader']       = 'Abrir o avaliador do Moodle para este aluno';
+$string['review_grade_none']        = 'Esta tarefa está configurada sem nota: apenas o feedback será publicado para o aluno.';
 $string['field_strengths']          = 'Pontos fortes';
 $string['field_strengths_hint']     = 'Um por linha. Será mostrado ao aluno como feedback positivo.';
 $string['field_improvements']       = 'A melhorar';
@@ -144,7 +149,8 @@ $string['feedback_justification'] = 'Resumo';
 
 $string['errornoproposal']      = 'Não há proposta IA disponível para este envio.';
 $string['errorparseproposal']   = 'A proposta IA armazenada não pôde ser lida. Reavalie para regenerá-la.';
-$string['errorgradeoutofrange'] = 'A nota deve estar entre 0 e 10 (recebido: {$a}).';
+$string['errorgradeoutofrange'] = 'A nota deve estar entre {$a->min} e {$a->max} (recebido: {$a->value}).';
+$string['erroradvancedgrading'] = 'Esta tarefa usa avaliação avançada (rubrica ou guia de avaliação), então a nota não pode ser publicada pelo AI Grader Pro. Avalie-a no avaliador do Moodle.';
 
 // Strings do Privacy provider.
 $string['privacy:metadata'] = 'AI Grader Pro armazena propostas de avaliação geradas por IA, registros de auditoria de cada ação e configuração por tarefa. Também envia dados pessoais a um provedor LLM externo via o AI Subsystem do Moodle.';
@@ -281,6 +287,7 @@ $string['bulk_skip_unsupported']       = 'Formato não suportado (envie um arqui
 $string['bulk_skip_no_proposal']       = 'Sem proposta IA (use Avaliar com IA primeiro)';
 $string['bulk_skip_unknown_state']     = 'Estado desconhecido na linha';
 $string['bulk_skip_unknown_action']    = 'Ação desconhecida';
+$string['bulk_skip_advanced_grading']  = 'A tarefa usa rubrica ou guia de avaliação (avalie no avaliador do Moodle)';
 
 // -----------------------------------------------------------------------.
 // Status counter + filter chips (manage page banner).

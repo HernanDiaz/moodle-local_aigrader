@@ -123,7 +123,12 @@ $string['review_seen_by_ai_help']         = 'Aquesta és la versió que la IA va
 $string['review_seen_by_ai_size']         = '{$a} KB de text extrets.';
 $string['review_seen_by_ai_warnings']     = 'Avisos sobre l\'extracció:';
 
-$string['field_finalgrade']         = 'Nota final (0-10)';
+$string['field_finalgrade']         = 'Nota final';
+$string['field_finalgrade_points']  = 'Nota final (sobre {$a})';
+$string['field_finalgrade_reference'] = 'Nota orientativa (0-10, no es publica)';
+$string['review_advanced_grading']  = 'Aquesta tasca fa servir qualificació avançada ({$a}). L\'AI Grader Pro encara no la pot omplir, així que no pot publicar la nota des d\'aquí. Fes servir la proposta com a referència i completa la qualificació al qualificador de Moodle. Pots desar els canvis aquí sense publicar.';
+$string['review_open_grader']       = 'Obre el qualificador de Moodle per a aquest alumne';
+$string['review_grade_none']        = 'Aquesta tasca està configurada sense qualificació: només es publicarà el feedback a l\'alumne.';
 $string['field_strengths']          = 'Punts forts';
 $string['field_strengths_hint']     = 'Un per línia. Es mostrarà a l\'alumne com a feedback positiu.';
 $string['field_improvements']       = 'A millorar';
@@ -144,7 +149,8 @@ $string['feedback_justification'] = 'Resum';
 
 $string['errornoproposal']      = 'No hi ha proposta IA disponible per a aquest lliurament.';
 $string['errorparseproposal']   = 'La proposta IA desada no s\'ha pogut llegir. Torna a qualificar per regenerar-la.';
-$string['errorgradeoutofrange'] = 'La nota ha d\'estar entre 0 i 10 (rebut: {$a}).';
+$string['errorgradeoutofrange'] = 'La nota ha d\'estar entre {$a->min} i {$a->max} (rebut: {$a->value}).';
+$string['erroradvancedgrading'] = 'Aquesta tasca fa servir qualificació avançada (rúbrica o guia d\'avaluació), així que la nota no es pot publicar des de l\'AI Grader Pro. Qualifica-la al qualificador de Moodle.';
 
 // Strings del Privacy provider.
 $string['privacy:metadata'] = 'AI Grader Pro emmagatzema propostes de qualificació generades per IA, registres d\'auditoria de cada acció i configuració per tasca. També envia dades personals a un proveïdor LLM extern via l\'AI Subsystem de Moodle.';
@@ -281,6 +287,7 @@ $string['bulk_skip_unsupported']       = 'Format no suportat (puja un fitxer và
 $string['bulk_skip_no_proposal']       = 'Sense proposta IA (usa Qualifica amb IA primer)';
 $string['bulk_skip_unknown_state']     = 'Estat desconegut a la fila';
 $string['bulk_skip_unknown_action']    = 'Acció desconeguda';
+$string['bulk_skip_advanced_grading']  = 'La tasca fa servir rúbrica o guia d\'avaluació (qualifica-la al qualificador de Moodle)';
 
 // -----------------------------------------------------------------------.
 // Status counter + filter chips (manage page banner).
