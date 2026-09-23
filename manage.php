@@ -47,6 +47,7 @@ require_login($course, false, $cm);
 
 $context = context_module::instance($cm->id);
 require_capability('local/aigrader:use', $context);
+\local_aigrader\availability::require_available_in_course($course);
 
 $assign = $DB->get_record('assign', ['id' => $cm->instance], '*', MUST_EXIST);
 $config = $DB->get_record('local_aigrader_assign', ['assignid' => $assign->id]);

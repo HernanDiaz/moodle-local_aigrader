@@ -41,6 +41,13 @@ $string['setting_rubric_autoimport_desc'] = 'Quando uma tarefa usa o método de 
 $string['setting_default_system_prompt'] = 'Prompt de sistema padrão';
 $string['setting_default_system_prompt_desc'] = 'Instrução institucional opcional que é adicionada ao system prompt de cada solicitação de avaliação. Útil para impor tom ou política consistentes entre todos os professores. Exemplo: "Forneça feedback construtivo em registro acadêmico, máximo 200 palavras." Deixe em branco para usar apenas o system prompt padrão do plugin.';
 
+$string['setting_availability_heading'] = 'Onde o AI Grader Pro está disponível';
+$string['setting_availability_heading_desc'] = 'Restrinja o AI Grader Pro a algumas categorias e/ou cursos. Deixe as duas configurações vazias para que ele fique disponível em todos os cursos. Onde não estiver disponível, os professores não verão suas opções nas tarefas nem poderão usá-lo.';
+$string['setting_allowedcategories'] = 'Categorias permitidas';
+$string['setting_allowedcategories_desc'] = 'O AI Grader Pro fica disponível nos cursos destas categorias, incluindo suas subcategorias.';
+$string['setting_allowedcourses'] = 'Cursos permitidos';
+$string['setting_allowedcourses_desc'] = 'Nomes breves de cursos específicos onde o AI Grader Pro está disponível, um por linha. Útil para um piloto em poucos cursos.';
+
 // Formulário de edição da tarefa (mod_assign).
 $string['form_enabled'] = 'Habilitar avaliação assistida por IA nesta tarefa';
 $string['form_enabled_help'] = 'Quando marcado, os professores podem executar o AI Grader Pro sobre os envios desta tarefa. A IA propõe nota e feedback; o professor revisa e decide. Nada é publicado ao aluno até que o professor aprove.';
@@ -103,6 +110,7 @@ $string['status_error']       = 'Erro';
 $string['status_unsupported'] = 'Formato não suportado';
 
 $string['errornotenabled']  = 'AI Grader Pro não está habilitado nesta tarefa.';
+$string['errornotavailable'] = 'O AI Grader Pro não está disponível neste curso. Consulte o administrador do site.';
 $string['errornocriteria']  = 'Não há critérios de avaliação definidos para esta tarefa.';
 
 // Página de revisão (/local/aigrader/review.php).

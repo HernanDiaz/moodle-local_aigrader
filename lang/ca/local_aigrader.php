@@ -41,6 +41,13 @@ $string['setting_rubric_autoimport_desc'] = 'Quan una tasca utilitza el mètode 
 $string['setting_default_system_prompt'] = 'Prompt de sistema per defecte';
 $string['setting_default_system_prompt_desc'] = 'Instrucció institucional opcional que s\'afegeix al system prompt de cada sol·licitud de qualificació. Útil per imposar un to o política consistents entre tots els professors. Exemple: "Aporta feedback constructiu en registre acadèmic, màxim 200 paraules." Deixa-ho buit per usar només el system prompt per defecte del connector.';
 
+$string['setting_availability_heading'] = 'On està disponible AI Grader Pro';
+$string['setting_availability_heading_desc'] = 'Limita AI Grader Pro a algunes categories i/o cursos. Deixa tots dos ajustos buits perquè estigui disponible a tots els cursos. On no estigui disponible, el professorat no en veurà les opcions a les tasques ni el podrà fer servir.';
+$string['setting_allowedcategories'] = 'Categories permeses';
+$string['setting_allowedcategories_desc'] = 'AI Grader Pro està disponible als cursos d\'aquestes categories, incloses les seves subcategories.';
+$string['setting_allowedcourses'] = 'Cursos permesos';
+$string['setting_allowedcourses_desc'] = 'Noms curts de cursos concrets on AI Grader Pro està disponible, un per línia. Útil per a una prova pilot en pocs cursos.';
+
 // Formulari d\'edició de la tasca (mod_assign).
 $string['form_enabled'] = 'Habilita la qualificació assistida per IA en aquesta tasca';
 $string['form_enabled_help'] = 'Quan està marcat, els professors poden executar AI Grader Pro sobre els lliuraments d\'aquesta tasca. La IA proposa nota i feedback; el professor revisa i decideix. No es publica res a l\'alumne fins que el professor aprova.';
@@ -103,6 +110,7 @@ $string['status_error']       = 'Error';
 $string['status_unsupported'] = 'Format no suportat';
 
 $string['errornotenabled']  = 'AI Grader Pro no està habilitat en aquesta tasca.';
+$string['errornotavailable'] = 'AI Grader Pro no està disponible en aquest curs. Consulta-ho amb l\'administració del lloc.';
 $string['errornocriteria']  = 'No hi ha criteris d\'avaluació definits per a aquesta tasca.';
 
 // Pàgina de revisió (/local/aigrader/review.php).

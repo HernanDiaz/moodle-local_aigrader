@@ -78,8 +78,8 @@ function local_aigrader_extend_settings_navigation(\settings_navigation $setting
         return;
     }
 
-    // Global plugin enable check.
-    if (!get_config('local_aigrader', 'enabled')) {
+    // Site-wide switch and course restriction.
+    if (!\local_aigrader\availability::is_available_in_course(get_course($cm->course))) {
         return;
     }
 

@@ -47,6 +47,7 @@ $confirm = optional_param('confirm', 0, PARAM_BOOL);
 require_login($course, false, $cm);
 $context = context_module::instance($cm->id);
 require_capability('local/aigrader:use', $context);
+\local_aigrader\availability::require_available_in_course($course);
 require_sesskey();
 
 // Validate action.

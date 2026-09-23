@@ -48,8 +48,8 @@ class assign_form_handler {
             return;
         }
 
-        // Honour the global enabled toggle from the plugin settings.
-        if (!get_config('local_aigrader', 'enabled')) {
+        // Site-wide switch, course restriction and configure capability.
+        if (!self::can_configure($formwrapper)) {
             return;
         }
 
@@ -142,10 +142,7 @@ class assign_form_handler {
      */
     public static function validate($formwrapper, array $data): array {
         $errors = [];
-        if (!self::is_assign_form($formwrapper)) {
-            return $errors;
-        }
-        if (!get_config('local_aigrader', 'enabled')) {
+        if (!self::can_configure($formwrapper)) {
             return $errors;
         }
 
@@ -172,12 +169,23 @@ class assign_form_handler {
         if (($moduleinfo->modulename ?? '') !== 'assign') {
             return $moduleinfo;
         }
-        if (!get_config('local_aigrader', 'enabled')) {
+        // Only persist when our fields were part of the submitted form. They
+        // are absent when add_elements() did not show them (plugin disabled,
+        // course not allowed, no configure capability) and when the module is
+        // created programmatically or restored; saving anyway would overwrite
+        // the existing configuration with empty values.
+        if (!property_exists($moduleinfo, self::FIELD_PREFIX . 'enabled')) {
+            return $moduleinfo;
+        }
+        if (!\local_aigrader\availability::is_available_in_course($course)) {
             return $moduleinfo;
         }
 
         $assignid = isset($moduleinfo->instance) ? (int) $moduleinfo->instance : 0;
         if (!$assignid) {
+            return $moduleinfo;
+        }
+        if (!has_capability('local/aigrader:configure', \context_module::instance((int) $moduleinfo->coursemodule))) {
             return $moduleinfo;
         }
 
@@ -216,6 +224,24 @@ class assign_form_handler {
         }
 
         return $moduleinfo;
+    }
+
+    /**
+     * Whether the current user may see and change AI Grader Pro settings in
+     * this form: it is the assignment form, the plugin is available in the
+     * course, and the user has local/aigrader:configure.
+     *
+     * @param \moodleform_mod $formwrapper The mod_form being built or validated.
+     * @return bool
+     */
+    private static function can_configure($formwrapper): bool {
+        if (!self::is_assign_form($formwrapper)) {
+            return false;
+        }
+        if (!\local_aigrader\availability::is_available_in_course($formwrapper->get_course())) {
+            return false;
+        }
+        return has_capability('local/aigrader:configure', $formwrapper->get_context());
     }
 
     /**

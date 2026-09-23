@@ -91,6 +91,10 @@ EOT;
             );
         }
 
+        // Also stops tasks queued before the administrator restricted the
+        // plugin away from this course, so no data is sent to the LLM.
+        \local_aigrader\availability::require_available_in_course(get_course((int) $assign->course));
+
         $language = self::resolve_language($config, $assign);
 
         $extraction = extractor_dispatcher::extract($submissionid);

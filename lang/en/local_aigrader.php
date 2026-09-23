@@ -41,6 +41,13 @@ $string['setting_rubric_autoimport_desc'] = 'When an assignment uses Moodle\'s r
 $string['setting_default_system_prompt'] = 'Default system prompt';
 $string['setting_default_system_prompt_desc'] = 'Optional institution-wide instruction prepended to the system prompt of every grading request. Use this to enforce consistent tone or policy across all teachers. Example: "Provide constructive feedback in academic register, maximum 200 words." Leave empty to use only the plugin\'s default system prompt.';
 
+$string['setting_availability_heading'] = 'Where AI Grader Pro is available';
+$string['setting_availability_heading_desc'] = 'Restrict AI Grader Pro to some categories and/or courses. Leave both settings empty to make it available in every course. Where it is not available, teachers do not see its settings in assignments and cannot use it.';
+$string['setting_allowedcategories'] = 'Allowed categories';
+$string['setting_allowedcategories_desc'] = 'AI Grader Pro is available in the courses of these categories, including their subcategories.';
+$string['setting_allowedcourses'] = 'Allowed courses';
+$string['setting_allowedcourses_desc'] = 'Short names of individual courses where AI Grader Pro is available, one per line. Useful for a pilot in a few courses.';
+
 // Assignment edit form (mod_assign).
 $string['form_enabled'] = 'Enable AI-assisted grading for this assignment';
 $string['form_enabled_help'] = 'When checked, teachers can trigger AI Grader Pro on this assignment\'s submissions. The AI proposes a grade and feedback; the teacher reviews and decides. Nothing is published to the student until the teacher approves.';
@@ -105,6 +112,7 @@ $string['status_error']       = 'Error';
 $string['status_unsupported'] = 'Unsupported format';
 
 $string['errornotenabled']  = 'AI Grader Pro is not enabled on this assignment.';
+$string['errornotavailable'] = 'AI Grader Pro is not available in this course. Ask your site administrator.';
 $string['errornocriteria']  = 'No evaluation criteria are set for this assignment.';
 
 // Review page (/local/aigrader/review.php).

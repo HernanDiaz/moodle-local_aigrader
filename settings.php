@@ -59,5 +59,28 @@ if ($hassiteconfig) {
         8
     ));
 
+    // 4. Where AI Grader Pro is available. Both empty = every course.
+    $settings->add(new admin_setting_heading(
+        'local_aigrader/availabilityheading',
+        get_string('setting_availability_heading', 'local_aigrader'),
+        get_string('setting_availability_heading_desc', 'local_aigrader')
+    ));
+    $settings->add(new admin_setting_configmultiselect(
+        'local_aigrader/allowedcategories',
+        get_string('setting_allowedcategories', 'local_aigrader'),
+        get_string('setting_allowedcategories_desc', 'local_aigrader'),
+        [],
+        [\local_aigrader\availability::class, 'get_category_choices']
+    ));
+    $settings->add(new admin_setting_configtextarea(
+        'local_aigrader/allowedcourses',
+        get_string('setting_allowedcourses', 'local_aigrader'),
+        get_string('setting_allowedcourses_desc', 'local_aigrader'),
+        '',
+        PARAM_RAW_TRIMMED,
+        40,
+        5
+    ));
+
     $ADMIN->add('localplugins', $settings);
 }

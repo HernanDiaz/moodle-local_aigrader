@@ -29,6 +29,16 @@ Feature: Configure AI Grader Pro on an assignment
     Then I should see "Essay 1"
 
   @javascript
+  Scenario: AI Grader Pro settings are hidden in courses the administrator did not allow
+    Given the following config values are set as admin:
+      | config         | value        | plugin         |
+      | allowedcourses | OTHER-COURSE | local_aigrader |
+    And I am logged in as "teacher1"
+    When I am on the "Essay 1" "assign activity editing" page
+    And I expand all fieldsets
+    Then I should not see "Enable AI-assisted grading for this assignment"
+
+  @javascript
   Scenario: Validation requires evaluation criteria when AI grading is enabled
     Given I am logged in as "teacher1"
     When I am on the "Essay 1" "assign activity editing" page

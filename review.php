@@ -51,6 +51,7 @@ $context = context_module::instance($cm->id);
 
 require_login($course, false, $cm);
 require_capability('local/aigrader:use', $context);
+\local_aigrader\availability::require_available_in_course($course);
 
 $scale = grading_scale::for_assign($assign, $context);
 

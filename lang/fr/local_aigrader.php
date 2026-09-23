@@ -41,6 +41,13 @@ $string['setting_rubric_autoimport_desc'] = 'Lorsqu\'un devoir utilise la métho
 $string['setting_default_system_prompt'] = 'Prompt système par défaut';
 $string['setting_default_system_prompt_desc'] = 'Instruction institutionnelle optionnelle ajoutée au system prompt de chaque demande d\'évaluation. Utile pour imposer un ton ou une politique cohérents entre tous les enseignants. Exemple : « Fournis un feedback constructif dans un registre académique, 200 mots maximum. » Laissez vide pour n\'utiliser que le system prompt par défaut du plugin.';
 
+$string['setting_availability_heading'] = 'Où AI Grader Pro est disponible';
+$string['setting_availability_heading_desc'] = 'Limitez AI Grader Pro à certaines catégories et/ou certains cours. Laissez les deux réglages vides pour qu\'il soit disponible dans tous les cours. Là où il n\'est pas disponible, les enseignants ne voient pas ses options dans les devoirs et ne peuvent pas l\'utiliser.';
+$string['setting_allowedcategories'] = 'Catégories autorisées';
+$string['setting_allowedcategories_desc'] = 'AI Grader Pro est disponible dans les cours de ces catégories, sous-catégories comprises.';
+$string['setting_allowedcourses'] = 'Cours autorisés';
+$string['setting_allowedcourses_desc'] = 'Noms abrégés de cours précis où AI Grader Pro est disponible, un par ligne. Utile pour un pilote dans quelques cours.';
+
 // Formulaire d\'édition du devoir (mod_assign).
 $string['form_enabled'] = 'Activer l\'évaluation assistée par IA sur ce devoir';
 $string['form_enabled_help'] = 'Lorsqu\'il est coché, les enseignants peuvent lancer AI Grader Pro sur les remises de ce devoir. L\'IA propose une note et un feedback ; l\'enseignant révise et décide. Rien n\'est publié à l\'étudiant tant que l\'enseignant n\'a pas approuvé.';
@@ -103,6 +110,7 @@ $string['status_error']       = 'Erreur';
 $string['status_unsupported'] = 'Format non pris en charge';
 
 $string['errornotenabled']  = 'AI Grader Pro n\'est pas activé sur ce devoir.';
+$string['errornotavailable'] = 'AI Grader Pro n\'est pas disponible dans ce cours. Contactez l\'administrateur du site.';
 $string['errornocriteria']  = 'Aucun critère d\'évaluation n\'est défini pour ce devoir.';
 
 // Page de révision (/local/aigrader/review.php).
