@@ -52,5 +52,15 @@ function xmldb_local_aigrader_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2026051403, 'local', 'aigrader');
     }
 
+    // v1.0.28 — per-assignment "grade automatically when the student submits".
+    if ($oldversion < 2026092401) {
+        $table = new xmldb_table('local_aigrader_assign');
+        $field = new xmldb_field('autograde', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'language_override');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026092401, 'local', 'aigrader');
+    }
+
     return true;
 }

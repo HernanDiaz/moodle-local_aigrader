@@ -116,7 +116,17 @@ class dispatcher implements extractor_interface {
             }
         }
 
-        return self::decide_outcome($submissionid, $parts, $warnings, $formats);
+        $result = self::decide_outcome($submissionid, $parts, $warnings, $formats);
+
+        // Keep the student's name and identifiers out of what the AI receives.
+        // Applied here so the review page shows exactly what was sent.
+        if ($result->is_ok() && \local_aigrader\name_redactor::is_enabled()) {
+            [$names, $identifiers] = \local_aigrader\name_redactor::terms_for_submission($assignsub);
+            $result = $result->map_text(
+                fn(string $text): string => \local_aigrader\name_redactor::redact($text, $names, $identifiers)
+            );
+        }
+        return $result;
     }
 
     /**
@@ -207,6 +217,23 @@ class dispatcher implements extractor_interface {
                 return self::unsupported($filename, get_string('extract_reason_docx_malformed', 'local_aigrader'));
             }
             return self::wrap_simple($filename, $text, extraction_result::FORMAT_DOCX, $warnings);
+        }
+
+        if ($ext === 'pptx') {
+            $text = pptx_extractor::extract_file($file);
+            if ($text === null) {
+                return self::unsupported($filename, get_string('extract_reason_pptx_malformed', 'local_aigrader'));
+            }
+            return self::wrap_simple($filename, $text, extraction_result::FORMAT_PPTX, $warnings);
+        }
+
+        if ($ext === 'odt' || $ext === 'odp') {
+            $text = odf_extractor::extract_file($file);
+            if ($text === null) {
+                return self::unsupported($filename, get_string('extract_reason_odf_malformed', 'local_aigrader', $ext));
+            }
+            $format = $ext === 'odt' ? extraction_result::FORMAT_ODT : extraction_result::FORMAT_ODP;
+            return self::wrap_simple($filename, $text, $format, $warnings);
         }
 
         if ($ext === 'ipynb') {

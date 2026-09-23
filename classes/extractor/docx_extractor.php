@@ -44,16 +44,26 @@ class docx_extractor {
         if ($tmppath === null) {
             return null;
         }
+        $text = self::extract_path($tmppath);
+        @unlink($tmppath);
+        return $text;
+    }
 
+    /**
+     * Extract plain text from a .docx file on disk (e.g. one found inside a
+     * .zip submission).
+     *
+     * @param string $path Filesystem path of the Word document.
+     * @return string|null Extracted plain text or null on failure / empty.
+     */
+    public static function extract_path(string $path): ?string {
         $zip = new \ZipArchive();
-        if ($zip->open($tmppath) !== true) {
-            @unlink($tmppath);
+        if ($zip->open($path) !== true) {
             return null;
         }
 
         $xml = $zip->getFromName('word/document.xml');
         $zip->close();
-        @unlink($tmppath);
 
         if (!$xml) {
             return null;

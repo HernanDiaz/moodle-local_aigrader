@@ -41,6 +41,9 @@ $string['setting_rubric_autoimport_desc'] = 'When an assignment uses Moodle\'s r
 $string['setting_default_system_prompt'] = 'Default system prompt';
 $string['setting_default_system_prompt_desc'] = 'Optional institution-wide instruction prepended to the system prompt of every grading request. Use this to enforce consistent tone or policy across all teachers. Example: "Provide constructive feedback in academic register, maximum 200 words." Leave empty to use only the plugin\'s default system prompt.';
 
+$string['setting_redactnames'] = 'Keep student names out of the AI';
+$string['setting_redactnames_desc'] = 'Before a submission is sent to the AI provider, replace the student\'s name, email address, username and ID number with [STUDENT], also in file names. The AI does not need them to grade, and they stay inside Moodle. Teachers see the replaced text under "Submission as seen by the AI". Turn this off only if your criteria need the student\'s name (for example, to check a cover page).';
+
 $string['setting_availability_heading'] = 'Where AI Grader Pro is available';
 $string['setting_availability_heading_desc'] = 'Restrict AI Grader Pro to some categories and/or courses. Leave both settings empty to make it available in every course. Where it is not available, teachers do not see its settings in assignments and cannot use it.';
 $string['setting_allowedcategories'] = 'Allowed categories';
@@ -70,6 +73,15 @@ $string['form_language_override'] = 'Feedback language (optional)';
 $string['form_language_override_help'] = 'If set, AI feedback for this assignment will be in this language instead of the course language. Leave on "Auto" to use the course\'s language.';
 
 $string['form_lang_auto'] = 'Auto (use course language)';
+
+$string['form_autograde'] = 'Grade automatically when a student submits';
+$string['form_autograde_help'] = 'When checked, AI Grader Pro prepares a proposal as soon as a student submits (or saves, if the assignment has no "Submit" button), so it is waiting in the AI Grader Pro panel when you open it. You still review and publish every grade. Each submission uses one AI call; submissions you have already reviewed or published are not graded again.';
+
+$string['form_copyfrom'] = 'Copy criteria from';
+$string['form_copyfrom_help'] = 'Reuse the evaluation criteria and feedback language of another assignment, from this course or another course you teach. Choose it and press "Copy": the form reloads with the copied criteria, which you can edit before saving.';
+$string['form_copyfrom_choose'] = 'Choose an assignment…';
+$string['form_copyfrom_button'] = 'Copy';
+$string['form_copyfrom_done'] = 'Criteria copied from "{$a}". Review them and save the assignment to keep them.';
 
 // Form errors.
 $string['error_criteria_required'] = 'Evaluation criteria are required when AI-assisted grading is enabled. Describe how the AI should evaluate the submissions.';
@@ -318,10 +330,12 @@ $string['count_perpage_all']          = 'All';
 // -----------------------------------------------------------------------.
 
 $string['extract_skip_marker']            = 'unsupported';
-$string['extract_needs_review_preamble']  = 'All submitted files are unparseable. Supported formats: .txt, .md, .docx, .ipynb, .pdf (≤5 MB, text-based), .zip and code files.';
+$string['extract_needs_review_preamble']  = 'All submitted files are unparseable. Supported formats: .txt, .md, .docx, .pptx, .odt, .odp, .ipynb, .pdf (≤5 MB, text-based), .zip and code files.';
 $string['extract_skipped_list']           = 'Skipped: {$a}.';
 
 $string['extract_reason_docx_malformed']     = 'docx (could not extract — file may be malformed)';
+$string['extract_reason_pptx_malformed']     = 'pptx (could not extract — file may be malformed or have no text)';
+$string['extract_reason_odf_malformed']      = '{$a} (could not extract — file may be malformed or have no text)';
 $string['extract_reason_ipynb_parse']        = 'ipynb (could not parse JSON)';
 $string['extract_reason_pdf_too_large']      = 'pdf too large ({$a->actual} MB; max {$a->max} MB — see plugin README)';
 $string['extract_reason_pdf_no_text']        = 'pdf has no extractable text (image-only scan or corrupt content)';

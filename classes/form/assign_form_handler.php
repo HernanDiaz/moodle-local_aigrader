@@ -110,6 +110,30 @@ class assign_form_handler {
         }
         $mform->setDefault(self::FIELD_PREFIX . 'criteria', $criteriadefault);
 
+        // Copy the criteria of another assignment the teacher can configure.
+        // The button reloads the form with the copied text (see
+        // definition_after_data()) so it can be reviewed before saving.
+        $candidates = self::copy_candidates($formwrapper, $assignid);
+        if ($candidates) {
+            $mform->addGroup([
+                $mform->createElement(
+                    'select',
+                    self::FIELD_PREFIX . 'copyfrom',
+                    get_string('form_copyfrom', 'local_aigrader'),
+                    ['' => get_string('form_copyfrom_choose', 'local_aigrader')] + $candidates
+                ),
+                $mform->createElement(
+                    'submit',
+                    self::FIELD_PREFIX . 'copybutton',
+                    get_string('form_copyfrom_button', 'local_aigrader')
+                ),
+            ], self::FIELD_PREFIX . 'copygroup', get_string('form_copyfrom', 'local_aigrader'), ' ', false);
+            $mform->setType(self::FIELD_PREFIX . 'copyfrom', PARAM_INT);
+            $mform->registerNoSubmitButton(self::FIELD_PREFIX . 'copybutton');
+            $mform->addHelpButton(self::FIELD_PREFIX . 'copygroup', 'form_copyfrom', 'local_aigrader');
+            $mform->hideIf(self::FIELD_PREFIX . 'copygroup', self::FIELD_PREFIX . 'enabled', 'notchecked');
+        }
+
         // Track source as hidden field (UI users don't set it, code does).
         $mform->addElement('hidden', self::FIELD_PREFIX . 'source', $source);
         $mform->setType(self::FIELD_PREFIX . 'source', PARAM_ALPHANUMEXT);
@@ -128,9 +152,117 @@ class assign_form_handler {
         $mform->addHelpButton(self::FIELD_PREFIX . 'language_override', 'form_language_override', 'local_aigrader');
         $mform->setDefault(self::FIELD_PREFIX . 'language_override', $existing->language_override ?? '');
 
+        // Grade automatically when a student submits (off by default: every
+        // submission then costs an AI call).
+        $mform->addElement(
+            'advcheckbox',
+            self::FIELD_PREFIX . 'autograde',
+            get_string('form_autograde', 'local_aigrader')
+        );
+        $mform->addHelpButton(self::FIELD_PREFIX . 'autograde', 'form_autograde', 'local_aigrader');
+        $mform->setDefault(self::FIELD_PREFIX . 'autograde', $existing->autograde ?? 0);
+
         // Only show the rest of fields if enabled. Cosmetic hideIf.
         $mform->hideIf(self::FIELD_PREFIX . 'criteria', self::FIELD_PREFIX . 'enabled', 'notchecked');
         $mform->hideIf(self::FIELD_PREFIX . 'language_override', self::FIELD_PREFIX . 'enabled', 'notchecked');
+        $mform->hideIf(self::FIELD_PREFIX . 'autograde', self::FIELD_PREFIX . 'enabled', 'notchecked');
+    }
+
+    /**
+     * After the form has its data: when the teacher pressed "Copy", fill the
+     * criteria (and feedback language) with those of the chosen assignment.
+     * Called from local_aigrader_coursemodule_definition_after_data().
+     *
+     * @param \moodleform_mod $formwrapper The mod_form being displayed.
+     * @param \MoodleQuickForm $mform Quickform reference.
+     */
+    public static function definition_after_data($formwrapper, \MoodleQuickForm $mform): void {
+        global $DB;
+
+        if (!self::is_assign_form($formwrapper) || !$mform->elementExists(self::FIELD_PREFIX . 'copygroup')) {
+            return;
+        }
+        if (!$mform->isSubmitted() || $mform->getSubmitValue(self::FIELD_PREFIX . 'copybutton') === null) {
+            return;
+        }
+
+        // Only an assignment that was offered to this teacher can be copied.
+        $sourceid = (int) $mform->getSubmitValue(self::FIELD_PREFIX . 'copyfrom');
+        $currentid = (int) ($formwrapper->get_current()->instance ?? 0);
+        $candidates = self::copy_candidates($formwrapper, $currentid);
+        if (!isset($candidates[$sourceid])) {
+            return;
+        }
+        $source = $DB->get_record('local_aigrader_assign', ['assignid' => $sourceid], 'criteria_text, language_override');
+        if (!$source) {
+            return;
+        }
+
+        // The page reloads at the top: open our section so the teacher sees the result.
+        $mform->setExpanded(self::FIELD_PREFIX . 'header', true);
+        $mform->getElement(self::FIELD_PREFIX . 'enabled')->setValue(1);
+        $mform->getElement(self::FIELD_PREFIX . 'criteria')->setValue((string) $source->criteria_text);
+        $mform->getElement(self::FIELD_PREFIX . 'language_override')->setValue((string) ($source->language_override ?? ''));
+        $mform->insertElementBefore(
+            $mform->createElement(
+                'static',
+                self::FIELD_PREFIX . 'copied_notice',
+                '',
+                \html_writer::div(get_string('form_copyfrom_done', 'local_aigrader', $candidates[$sourceid]), 'alert alert-success')
+            ),
+            self::FIELD_PREFIX . 'criteria'
+        );
+    }
+
+    /**
+     * Other assignments whose AI Grader Pro criteria the current user may
+     * copy: those with criteria, in this course or in the user's other
+     * courses, where the user has local/aigrader:configure.
+     *
+     * @param \moodleform_mod $formwrapper The mod_form being built.
+     * @param int $currentassignid Id of the assignment being edited (0 when new).
+     * @return array<int, string> Assignment id => "COURSE: Assignment name", this course first.
+     */
+    public static function copy_candidates($formwrapper, int $currentassignid): array {
+        global $DB, $USER;
+
+        $courseid = (int) $formwrapper->get_course()->id;
+        $courseids = array_keys(enrol_get_users_courses($USER->id, true, 'id'));
+        $courseids[] = $courseid;
+        [$insql, $params] = $DB->get_in_or_equal(array_unique($courseids), SQL_PARAMS_NAMED);
+        $params['modname'] = 'assign';
+        $params['current'] = $currentassignid;
+
+        $rows = $DB->get_records_sql(
+            "SELECT la.assignid, a.name, a.course, c.shortname, cm.id AS cmid
+               FROM {local_aigrader_assign} la
+               JOIN {assign} a ON a.id = la.assignid
+               JOIN {course} c ON c.id = a.course
+               JOIN {modules} m ON m.name = :modname
+               JOIN {course_modules} cm ON cm.module = m.id AND cm.instance = a.id
+              WHERE a.course $insql
+                AND la.assignid <> :current
+                AND " . $DB->sql_isnotempty('local_aigrader_assign', 'la.criteria_text', true, true) . "
+           ORDER BY c.shortname, a.name",
+            $params,
+            0,
+            200
+        );
+
+        $here = [];
+        $elsewhere = [];
+        foreach ($rows as $row) {
+            if (!has_capability('local/aigrader:configure', \context_module::instance($row->cmid))) {
+                continue;
+            }
+            $label = format_string($row->shortname) . ': ' . format_string($row->name);
+            if ((int) $row->course === $courseid) {
+                $here[(int) $row->assignid] = $label;
+            } else {
+                $elsewhere[(int) $row->assignid] = $label;
+            }
+        }
+        return $here + $elsewhere;
     }
 
     /**
@@ -212,6 +344,7 @@ class assign_form_handler {
         // used. Clear any value left over from earlier versions.
         $record->model_override = null;
         $record->language_override = $languageoverride !== '' ? $languageoverride : null;
+        $record->autograde = !empty($moduleinfo->{self::FIELD_PREFIX . 'autograde'}) ? 1 : 0;
         $record->usermodified = $USER->id;
         $record->timemodified = $now;
 

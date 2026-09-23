@@ -44,6 +44,16 @@ class zip_extractor {
     private const MAX_FILE_SIZE      = 1048576;
     /** @var int Total wall-clock seconds we will spend on one zip. */
     private const TIME_BUDGET_SECS   = 60;
+    /** @var int Max size in bytes of an office document inside the zip (they carry images). */
+    private const MAX_OFFICE_FILE_SIZE = 20971520;
+
+    /** Office documents read through their own extractor, with their label. */
+    private const OFFICE_EXTENSIONS = [
+        'docx' => 'Word document',
+        'pptx' => 'PowerPoint presentation',
+        'odt'  => 'OpenDocument text',
+        'odp'  => 'OpenDocument presentation',
+    ];
 
     /** Directories whose contents we always skip. */
     private const SKIP_DIR_FRAGMENTS = [
@@ -113,6 +123,26 @@ class zip_extractor {
             }
 
             $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+
+            // Office documents are zips themselves: read them with their extractor
+            // instead of discarding them as binary.
+            if (isset(self::OFFICE_EXTENSIONS[$ext])) {
+                if ($stat['size'] > self::MAX_OFFICE_FILE_SIZE) {
+                    $warnings[] = $name . ' skipped (size ' . $stat['size'] . ' > 20 MB)';
+                    continue;
+                }
+                $text = self::extract_office_entry($zip, $i, $ext);
+                if ($text === null) {
+                    $warnings[] = $name . ' skipped (could not read the document)';
+                    continue;
+                }
+                $parts[] = '--- ' . $name . ' (' . self::OFFICE_EXTENSIONS[$ext] . ') ---';
+                $parts[] = $text;
+                $parts[] = '';
+                $processed++;
+                continue;
+            }
+
             if (in_array($ext, self::SKIP_EXTENSIONS, true)) {
                 $skipped++;
                 continue;
@@ -155,6 +185,34 @@ class zip_extractor {
             'text'     => trim(implode("\n", $parts)),
             'warnings' => $warnings,
         ];
+    }
+
+    /**
+     * Extract the text of an office document stored inside the zip.
+     *
+     * @param \ZipArchive $zip The open outer zip.
+     * @param int $index Index of the entry in the zip.
+     * @param string $ext Lower-case extension, a key of OFFICE_EXTENSIONS.
+     * @return string|null Extracted text, or null if the document could not be read.
+     */
+    private static function extract_office_entry(\ZipArchive $zip, int $index, string $ext): ?string {
+        $content = $zip->getFromIndex($index);
+        if ($content === false) {
+            return null;
+        }
+        $tmp = tempnam(sys_get_temp_dir(), 'aigrader_zipdoc_');
+        if ($tmp === false || file_put_contents($tmp, $content) === false) {
+            return null;
+        }
+        try {
+            return match ($ext) {
+                'docx' => docx_extractor::extract_path($tmp),
+                'pptx' => pptx_extractor::extract_path($tmp),
+                default => odf_extractor::extract_path($tmp),
+            };
+        } finally {
+            @unlink($tmp);
+        }
     }
 
     /**

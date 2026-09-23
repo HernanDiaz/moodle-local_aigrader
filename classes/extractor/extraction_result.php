@@ -55,6 +55,15 @@ class extraction_result {
     /** Format identifier for PDF files (text extracted via smalot/pdfparser). */
     public const FORMAT_PDF         = 'pdf';
 
+    /** Format identifier for PowerPoint presentations (.pptx). */
+    public const FORMAT_PPTX        = 'pptx';
+
+    /** Format identifier for OpenDocument text (.odt). */
+    public const FORMAT_ODT         = 'odt';
+
+    /** Format identifier for OpenDocument presentations (.odp). */
+    public const FORMAT_ODP         = 'odp';
+
     /** Format identifier used when multiple types are combined. */
     public const FORMAT_MIXED       = 'mixed';
 
@@ -162,6 +171,25 @@ class extraction_result {
         $r = new self('', self::FORMAT_UNSUPPORTED, $warnings, false, $reason);
         $r->needs_review = true;
         return $r;
+    }
+
+    /**
+     * A copy of this result with a transformation applied to the text and to
+     * the warnings (which also reach the prompt), keeping format and flags.
+     *
+     * @param callable $transform function(string): string.
+     * @return extraction_result
+     */
+    public function map_text(callable $transform): self {
+        $copy = new self(
+            $transform($this->text),
+            $this->format,
+            array_map($transform, $this->warnings),
+            $this->truncated,
+            $this->error
+        );
+        $copy->needs_review = $this->needs_review;
+        return $copy;
     }
 
     /**

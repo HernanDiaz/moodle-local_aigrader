@@ -41,6 +41,9 @@ $string['setting_rubric_autoimport_desc'] = 'Quando uma tarefa usa o método de 
 $string['setting_default_system_prompt'] = 'Prompt de sistema padrão';
 $string['setting_default_system_prompt_desc'] = 'Instrução institucional opcional que é adicionada ao system prompt de cada solicitação de avaliação. Útil para impor tom ou política consistentes entre todos os professores. Exemplo: "Forneça feedback construtivo em registro acadêmico, máximo 200 palavras." Deixe em branco para usar apenas o system prompt padrão do plugin.';
 
+$string['setting_redactnames'] = 'Não enviar o nome do aluno para a IA';
+$string['setting_redactnames_desc'] = 'Antes de enviar um envio ao provedor de IA, substitui o nome do aluno, o e-mail, o nome de usuário e o número de identificação por [STUDENT], inclusive nos nomes de arquivo. A IA não precisa deles para avaliar e eles não saem do Moodle. Os professores veem o texto substituído em "Envio como a IA o viu". Desative apenas se os seus critérios precisarem do nome do aluno (por exemplo, para conferir uma capa).';
+
 $string['setting_availability_heading'] = 'Onde o AI Grader Pro está disponível';
 $string['setting_availability_heading_desc'] = 'Restrinja o AI Grader Pro a algumas categorias e/ou cursos. Deixe as duas configurações vazias para que ele fique disponível em todos os cursos. Onde não estiver disponível, os professores não verão suas opções nas tarefas nem poderão usá-lo.';
 $string['setting_allowedcategories'] = 'Categorias permitidas';
@@ -70,6 +73,15 @@ $string['form_language_override'] = 'Idioma do feedback (opcional)';
 $string['form_language_override_help'] = 'Se definido, o feedback da IA para esta tarefa será neste idioma em vez do idioma do curso. Deixe em "Auto" para usar o idioma do curso.';
 
 $string['form_lang_auto'] = 'Auto (usar idioma do curso)';
+
+$string['form_autograde'] = 'Avaliar automaticamente quando um aluno enviar';
+$string['form_autograde_help'] = 'Se marcado, o AI Grader Pro prepara uma proposta assim que um aluno envia (ou salva, se a tarefa não tiver o botão "Enviar"), para que ela já esteja no painel do AI Grader Pro quando você o abrir. Você continua revisando e publicando cada nota. Cada envio usa uma chamada à IA; envios que você já revisou ou publicou não são avaliados novamente.';
+
+$string['form_copyfrom'] = 'Copiar critérios de';
+$string['form_copyfrom_help'] = 'Reutilize os critérios de avaliação e o idioma do feedback de outra tarefa, deste curso ou de outro curso em que você leciona. Escolha-a e clique em "Copiar": o formulário é recarregado com os critérios copiados, que você pode editar antes de salvar.';
+$string['form_copyfrom_choose'] = 'Escolha uma tarefa…';
+$string['form_copyfrom_button'] = 'Copiar';
+$string['form_copyfrom_done'] = 'Critérios copiados de "{$a}". Revise-os e salve a tarefa para mantê-los.';
 
 // Erros de validação.
 $string['error_criteria_required'] = 'Os critérios de avaliação são obrigatórios quando a avaliação assistida por IA está habilitada. Descreva como a IA deve avaliar os envios.';
@@ -317,10 +329,12 @@ $string['count_perpage_all']          = 'Todas';
 // -----------------------------------------------------------------------.
 
 $string['extract_skip_marker']            = 'não suportado';
-$string['extract_needs_review_preamble']  = 'Todos os arquivos enviados são ilegíveis. Formatos suportados: .txt, .md, .docx, .ipynb, .pdf (≤5 MB, com texto extraível), .zip e arquivos de código.';
+$string['extract_needs_review_preamble']  = 'Todos os arquivos enviados são ilegíveis. Formatos suportados: .txt, .md, .docx, .pptx, .odt, .odp, .ipynb, .pdf (≤5 MB, com texto extraível), .zip e arquivos de código.';
 $string['extract_skipped_list']           = 'Pulados: {$a}.';
 
 $string['extract_reason_docx_malformed']     = 'docx (não foi possível extrair; o arquivo pode estar corrompido)';
+$string['extract_reason_pptx_malformed']     = 'pptx (não foi possível extrair; o arquivo pode estar corrompido ou não ter texto)';
+$string['extract_reason_odf_malformed']      = '{$a} (não foi possível extrair; o arquivo pode estar corrompido ou não ter texto)';
 $string['extract_reason_ipynb_parse']        = 'ipynb (não foi possível parsear o JSON)';
 $string['extract_reason_pdf_too_large']      = 'pdf muito grande ({$a->actual} MB; máximo {$a->max} MB — ver README do plugin)';
 $string['extract_reason_pdf_no_text']        = 'pdf sem texto extraível (pode ser um escaneamento somente-imagem ou conteúdo corrompido)';

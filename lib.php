@@ -40,6 +40,16 @@ function local_aigrader_coursemodule_standard_elements($formwrapper, $mform): vo
 }
 
 /**
+ * Fill the criteria copied from another assignment when the teacher pressed "Copy".
+ *
+ * @param moodleform $formwrapper The mod_form being displayed.
+ * @param MoodleQuickForm $mform Quickform reference.
+ */
+function local_aigrader_coursemodule_definition_after_data($formwrapper, $mform): void {
+    assign_form_handler::definition_after_data($formwrapper, $mform);
+}
+
+/**
  * Validate AI Grader Pro fields submitted via the assignment edit form.
  *
  * @param moodleform $formwrapper

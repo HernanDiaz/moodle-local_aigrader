@@ -42,6 +42,7 @@ final class backup_restore_test extends \advanced_testcase {
         $this->getDataGenerator()->get_plugin_generator('local_aigrader')->enable_for_assignment($assign, [
             'criteria_text'     => 'TEST-MARKER evaluate thesis clarity',
             'language_override' => 'es',
+            'autograde'         => 1,
         ]);
 
         $cm = get_coursemodule_from_id('assign', $module->cmid, 0, false, MUST_EXIST);
@@ -52,6 +53,7 @@ final class backup_restore_test extends \advanced_testcase {
         $this->assertSame('1', (string) $newconfig->enabled);
         $this->assertSame('TEST-MARKER evaluate thesis clarity', $newconfig->criteria_text);
         $this->assertSame('es', $newconfig->language_override);
+        $this->assertSame('1', (string) $newconfig->autograde);
         // The original keeps its own row.
         $this->assertSame(2, $DB->count_records('local_aigrader_assign'));
     }

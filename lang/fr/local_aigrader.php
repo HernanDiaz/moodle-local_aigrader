@@ -41,6 +41,9 @@ $string['setting_rubric_autoimport_desc'] = 'Lorsqu\'un devoir utilise la métho
 $string['setting_default_system_prompt'] = 'Prompt système par défaut';
 $string['setting_default_system_prompt_desc'] = 'Instruction institutionnelle optionnelle ajoutée au system prompt de chaque demande d\'évaluation. Utile pour imposer un ton ou une politique cohérents entre tous les enseignants. Exemple : « Fournis un feedback constructif dans un registre académique, 200 mots maximum. » Laissez vide pour n\'utiliser que le system prompt par défaut du plugin.';
 
+$string['setting_redactnames'] = 'Ne pas envoyer le nom de l\'étudiant à l\'IA';
+$string['setting_redactnames_desc'] = 'Avant d\'envoyer une remise au fournisseur d\'IA, remplace le nom de l\'étudiant, son adresse e-mail, son nom d\'utilisateur et son numéro d\'identification par [STUDENT], y compris dans les noms de fichiers. L\'IA n\'en a pas besoin pour évaluer et ils restent dans Moodle. Les enseignants voient le texte remplacé dans « Remise telle que l\'IA l\'a lue ». Ne désactivez cette option que si vos critères ont besoin du nom de l\'étudiant (par exemple pour vérifier une page de garde).';
+
 $string['setting_availability_heading'] = 'Où AI Grader Pro est disponible';
 $string['setting_availability_heading_desc'] = 'Limitez AI Grader Pro à certaines catégories et/ou certains cours. Laissez les deux réglages vides pour qu\'il soit disponible dans tous les cours. Là où il n\'est pas disponible, les enseignants ne voient pas ses options dans les devoirs et ne peuvent pas l\'utiliser.';
 $string['setting_allowedcategories'] = 'Catégories autorisées';
@@ -70,6 +73,15 @@ $string['form_language_override'] = 'Langue du feedback (optionnel)';
 $string['form_language_override_help'] = 'Si défini, le feedback de l\'IA pour ce devoir sera dans cette langue au lieu de la langue du cours. Laissez sur « Auto » pour utiliser la langue du cours.';
 
 $string['form_lang_auto'] = 'Auto (utiliser la langue du cours)';
+
+$string['form_autograde'] = 'Évaluer automatiquement lorsqu\'un étudiant remet son travail';
+$string['form_autograde_help'] = 'Si cette case est cochée, AI Grader Pro prépare une proposition dès qu\'un étudiant remet son travail (ou l\'enregistre, si le devoir n\'a pas de bouton « Envoyer »), afin qu\'elle vous attende dans le panneau AI Grader Pro. Vous continuez à relire et publier chaque note. Chaque remise utilise un appel à l\'IA ; les remises que vous avez déjà relues ou publiées ne sont pas réévaluées.';
+
+$string['form_copyfrom'] = 'Copier les critères de';
+$string['form_copyfrom_help'] = 'Réutilisez les critères d\'évaluation et la langue du feedback d\'un autre devoir, de ce cours ou d\'un autre cours où vous enseignez. Choisissez-le et cliquez sur « Copier » : le formulaire se recharge avec les critères copiés, que vous pouvez modifier avant d\'enregistrer.';
+$string['form_copyfrom_choose'] = 'Choisissez un devoir…';
+$string['form_copyfrom_button'] = 'Copier';
+$string['form_copyfrom_done'] = 'Critères copiés de « {$a} ». Relisez-les et enregistrez le devoir pour les conserver.';
 
 // Erreurs de validation.
 $string['error_criteria_required'] = 'Les critères d\'évaluation sont obligatoires lorsque l\'évaluation assistée par IA est activée. Décrivez comment l\'IA doit évaluer les remises.';
@@ -317,10 +329,12 @@ $string['count_perpage_all']          = 'Toutes';
 // -----------------------------------------------------------------------.
 
 $string['extract_skip_marker']            = 'non pris en charge';
-$string['extract_needs_review_preamble']  = 'Tous les fichiers envoyés sont illisibles. Formats pris en charge : .txt, .md, .docx, .ipynb, .pdf (≤5 MB, avec texte extractible), .zip et fichiers de code.';
+$string['extract_needs_review_preamble']  = 'Tous les fichiers envoyés sont illisibles. Formats pris en charge : .txt, .md, .docx, .pptx, .odt, .odp, .ipynb, .pdf (≤5 MB, avec texte extractible), .zip et fichiers de code.';
 $string['extract_skipped_list']           = 'Ignorés : {$a}.';
 
 $string['extract_reason_docx_malformed']     = 'docx (impossible d\'extraire ; le fichier est peut-être endommagé)';
+$string['extract_reason_pptx_malformed']     = 'pptx (impossible d\'extraire ; le fichier est peut-être endommagé ou sans texte)';
+$string['extract_reason_odf_malformed']      = '{$a} (impossible d\'extraire ; le fichier est peut-être endommagé ou sans texte)';
 $string['extract_reason_ipynb_parse']        = 'ipynb (impossible de parser le JSON)';
 $string['extract_reason_pdf_too_large']      = 'pdf trop volumineux ({$a->actual} MB ; maximum {$a->max} MB — voir le README du plugin)';
 $string['extract_reason_pdf_no_text']        = 'pdf sans texte extractible (peut être un scan uniquement-image ou un contenu endommagé)';

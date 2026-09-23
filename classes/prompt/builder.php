@@ -130,6 +130,11 @@ EOT;
         }
 
         $user .= "=== STUDENT SUBMISSION (format: " . $extraction->format . ") ===\n";
+        if (str_contains($student, \local_aigrader\name_redactor::PLACEHOLDER)) {
+            $user .= "(The student's name and identifiers were replaced with "
+                . \local_aigrader\name_redactor::PLACEHOLDER
+                . " for privacy. This is not a mistake by the student: do not comment on it or penalise it.)\n";
+        }
         $user .= $student . "\n\n";
 
         if (!empty($extraction->warnings)) {

@@ -41,6 +41,9 @@ $string['setting_rubric_autoimport_desc'] = 'Quan una tasca utilitza el mètode 
 $string['setting_default_system_prompt'] = 'Prompt de sistema per defecte';
 $string['setting_default_system_prompt_desc'] = 'Instrucció institucional opcional que s\'afegeix al system prompt de cada sol·licitud de qualificació. Útil per imposar un to o política consistents entre tots els professors. Exemple: "Aporta feedback constructiu en registre acadèmic, màxim 200 paraules." Deixa-ho buit per usar només el system prompt per defecte del connector.';
 
+$string['setting_redactnames'] = 'No enviar el nom de l\'alumne a la IA';
+$string['setting_redactnames_desc'] = 'Abans d\'enviar un lliurament al proveïdor d\'IA, substitueix el nom de l\'alumne, el correu, el nom d\'usuari i el número d\'identificació per [STUDENT], també en els noms de fitxer. La IA no els necessita per qualificar i no surten de Moodle. El professorat veu el text substituït a "Lliurament tal com el va veure la IA". Desactiva-ho només si els teus criteris necessiten el nom de l\'alumne (per exemple, per revisar una portada).';
+
 $string['setting_availability_heading'] = 'On està disponible AI Grader Pro';
 $string['setting_availability_heading_desc'] = 'Limita AI Grader Pro a algunes categories i/o cursos. Deixa tots dos ajustos buits perquè estigui disponible a tots els cursos. On no estigui disponible, el professorat no en veurà les opcions a les tasques ni el podrà fer servir.';
 $string['setting_allowedcategories'] = 'Categories permeses';
@@ -70,6 +73,15 @@ $string['form_language_override'] = 'Idioma del feedback (opcional)';
 $string['form_language_override_help'] = 'Si el defineixes, el feedback de la IA per a aquesta tasca anirà en aquest idioma en lloc de l\'idioma del curs. Deixa-ho a "Auto" per usar l\'idioma del curs.';
 
 $string['form_lang_auto'] = 'Auto (usa l\'idioma del curs)';
+
+$string['form_autograde'] = 'Qualifica automàticament quan un alumne lliuri';
+$string['form_autograde_help'] = 'Si està marcat, AI Grader Pro prepara una proposta tan bon punt un alumne lliura (o desa, si la tasca no té el botó "Envia"), de manera que ja és al tauler d\'AI Grader Pro quan l\'obres. Tu continues revisant i publicant cada nota. Cada lliurament fa servir una crida a la IA; els lliuraments que ja has revisat o publicat no es tornen a qualificar.';
+
+$string['form_copyfrom'] = 'Copia els criteris de';
+$string['form_copyfrom_help'] = 'Reutilitza els criteris d\'avaluació i l\'idioma del feedback d\'una altra tasca, d\'aquest curs o d\'un altre curs on imparteixis. Tria-la i prem "Copia": el formulari es recarrega amb els criteris copiats, que pots editar abans de desar.';
+$string['form_copyfrom_choose'] = 'Tria una tasca…';
+$string['form_copyfrom_button'] = 'Copia';
+$string['form_copyfrom_done'] = 'Criteris copiats de "{$a}". Revisa\'ls i desa la tasca per conservar-los.';
 
 // Errors de validació.
 $string['error_criteria_required'] = 'Els criteris d\'avaluació són obligatoris quan la qualificació assistida per IA està habilitada. Descriu com ha d\'avaluar la IA els lliuraments.';
@@ -317,10 +329,12 @@ $string['count_perpage_all']          = 'Totes';
 // -----------------------------------------------------------------------.
 
 $string['extract_skip_marker']            = 'no suportat';
-$string['extract_needs_review_preamble']  = 'Tots els fitxers enviats són il·legibles. Formats suportats: .txt, .md, .docx, .ipynb, .pdf (≤5 MB, amb text extraïble), .zip i fitxers de codi.';
+$string['extract_needs_review_preamble']  = 'Tots els fitxers enviats són il·legibles. Formats suportats: .txt, .md, .docx, .pptx, .odt, .odp, .ipynb, .pdf (≤5 MB, amb text extraïble), .zip i fitxers de codi.';
 $string['extract_skipped_list']           = 'Saltats: {$a}.';
 
 $string['extract_reason_docx_malformed']     = 'docx (no s\'ha pogut extreure; el fitxer podria estar malmès)';
+$string['extract_reason_pptx_malformed']     = 'pptx (no s\'ha pogut extreure; el fitxer podria estar malmès o no tenir text)';
+$string['extract_reason_odf_malformed']      = '{$a} (no s\'ha pogut extreure; el fitxer podria estar malmès o no tenir text)';
 $string['extract_reason_ipynb_parse']        = 'ipynb (no s\'ha pogut parsejar el JSON)';
 $string['extract_reason_pdf_too_large']      = 'pdf massa gran ({$a->actual} MB; màxim {$a->max} MB — vegeu el README del connector)';
 $string['extract_reason_pdf_no_text']        = 'pdf sense text extraïble (pot ser un escaneig només-imatge o contingut malmès)';

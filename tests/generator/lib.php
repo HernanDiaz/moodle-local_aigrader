@@ -94,6 +94,7 @@ class local_aigrader_generator extends component_generator_base {
             'source'            => 'manual',
             'model_override'    => null,
             'language_override' => null,
+            'autograde'         => 0,
             'usermodified'      => (int) ($USER->id ?? 2),
             'timecreated'       => $now,
             'timemodified'      => $now,

@@ -63,6 +63,7 @@ class backup_local_aigrader_plugin extends backup_local_plugin {
             'source',
             'model_override',
             'language_override',
+            'autograde',
             'usermodified',
             'timecreated',
             'timemodified',

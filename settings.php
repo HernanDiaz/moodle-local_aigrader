@@ -59,7 +59,15 @@ if ($hassiteconfig) {
         8
     ));
 
-    // 4. Where AI Grader Pro is available. Both empty = every course.
+    // 4. Keep the student's name out of what is sent to the AI provider.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_aigrader/redactnames',
+        get_string('setting_redactnames', 'local_aigrader'),
+        get_string('setting_redactnames_desc', 'local_aigrader'),
+        1
+    ));
+
+    // 5. Where AI Grader Pro is available. Both empty = every course.
     $settings->add(new admin_setting_heading(
         'local_aigrader/availabilityheading',
         get_string('setting_availability_heading', 'local_aigrader'),
