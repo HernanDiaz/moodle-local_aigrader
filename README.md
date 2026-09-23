@@ -7,7 +7,7 @@ edits if needed, and decides whether to publish. Nothing reaches the
 gradebook without an explicit teacher click.
 
 [![CI](https://github.com/HernanDiaz/moodle-local_aigrader/actions/workflows/moodle-ci.yml/badge.svg)](https://github.com/HernanDiaz/moodle-local_aigrader/actions/workflows/moodle-ci.yml)
-[![Tests](https://img.shields.io/badge/PHPUnit-85%20tests%20passing-brightgreen)](#tests)
+[![Tests](https://img.shields.io/badge/PHPUnit-111%20tests%20passing-brightgreen)](#tests)
 [![Code style](https://img.shields.io/badge/phpcs-0%20errors-brightgreen)](#code-quality)
 [![Languages](https://img.shields.io/badge/i18n-5%20languages-blue)](#features)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
@@ -76,15 +76,26 @@ contains the teacher's `user.id`, never a system id.
 - 🌐 **i18n**: ships with English, Spanish, Brazilian Portuguese,
   Catalan and French — all 194 strings, full key parity. Other
   languages welcome via PR or via AMOS once on the Plugin Directory.
+- 🎯 **Grades on the assignment's own scale**: the AI reasons on 0-10,
+  the teacher sees and publishes "80 / 100" on an assignment out of
+  100, or the scale item on an assignment graded with a scale.
+  Assignments with a rubric or marking guide are graded in Moodle's
+  grader (the AI proposal stays as guidance).
+- 🏫 **Choose where it is available**: the site administrator can limit
+  the plugin to some course categories or courses.
+- 💾 **Backup and restore**: the configuration travels with backups,
+  imports and duplications; with user data, so do the proposals,
+  teacher decisions and audit log.
 - 🛡️ **Privacy provider** implementing GDPR Art. 15 (data export),
   Art. 17 (deletion) and the AI Act Annex III audit trail.
-- ✅ **Tested**: 85 PHPUnit tests + 2 Behat scenarios covering the most
-  fragile integration point (the hook into `mod_assign`'s edit form).
+- ✅ **Tested**: 111 PHPUnit tests + 14 Behat scenarios, on Moodle 4.5,
+  5.0, 5.1 and 5.2 in CI.
 
 ## Requirements
 
-- Moodle **4.5 LTS** or later (`$plugin->requires = 2024100700`).
-- PHP **8.2** or later.
+- Moodle **4.5 LTS** or later (`$plugin->requires = 2024100700`);
+  tested on 4.5, 5.0, 5.1 and 5.2.
+- The PHP version your Moodle requires (8.1+ on 4.5, 8.3+ on 5.2).
 - An LLM provider configured through *Site administration → AI →
   Providers*. The plugin uses the `generate_text` action of the AI
   Subsystem so any provider exposing it works (OpenAI, Azure OpenAI,
@@ -96,10 +107,10 @@ contains the teacher's `user.id`, never a system id.
 
 ## Installation
 
-### From the Moodle Plugins Directory (recommended)
+### From the Moodle Marketplace (recommended)
 
-1. Site administration → Plugins → Install plugins.
-2. Search for "AI Grader Pro", click Install.
+1. Download the ZIP of "AI Grader Pro" from the Moodle Marketplace.
+2. Site administration → Plugins → Install plugins → upload the ZIP.
 3. Confirm the upgrade prompt.
 
 ### Manual
@@ -121,7 +132,14 @@ Site administration → AI → Providers → enable a provider, paste the API
 key, set the default model. The plugin uses whatever the AI Subsystem
 returns; no provider lock-in.
 
-### 2. Per-assignment setup
+### 2. Choose where it is available (optional)
+
+Site administration → Plugins → Local plugins → AI Grader Pro →
+**Where AI Grader Pro is available**: pick course categories
+(subcategories included) and/or list course short names. Leave both
+empty to make it available in every course.
+
+### 3. Per-assignment setup
 
 Open any assignment → edit settings → expand **AI Grader Pro**:
 
@@ -144,7 +162,7 @@ Open any assignment → edit settings → expand **AI Grader Pro**:
 
 - Save the assignment.
 
-### 3. Triggering grading
+### 4. Triggering grading
 
 When a student submits, the plugin enqueues an adhoc task that calls
 the LLM on the next cron tick (≤60 s on a healthy site). The teacher
@@ -169,8 +187,8 @@ assignment.
 | Capability                 | Default                       | What it allows                                          |
 |----------------------------|-------------------------------|---------------------------------------------------------|
 | `local/aigrader:use`       | editingteacher, manager       | Use AI grading on an assignment submission              |
-| `local/aigrader:configure` | editingteacher, manager       | Configure criteria, model, language for an assignment   |
-| `local/aigrader:viewlog`   | manager                       | View the full audit log (system-wide)                   |
+| `local/aigrader:configure` | editingteacher, manager       | Enable AI grading, write criteria, set feedback language |
+| `local/aigrader:viewlog`   | manager                       | Reserved for the audit log report (not used yet)        |
 
 ## Privacy
 
@@ -205,12 +223,12 @@ vendor/bin/phpunit --testsuite local_aigrader_testsuite
 vendor/bin/behat --tags @local_aigrader
 ```
 
-Current status: 85 PHPUnit tests + 2 Behat scenarios, all passing.
+Current status: 111 PHPUnit tests + 14 Behat scenarios, all passing.
 
 For manual end-to-end smoke testing (after an upgrade, or during
-peer review), see [TESTPLAN.md](TESTPLAN.md) — 18 scenarios walking
+peer review), see [TESTPLAN.md](TESTPLAN.md) — 19 scenarios walking
 through install, configure, grade, publish, bulk, filter, error
-paths, privacy export and uninstall.
+paths, privacy export, backup/restore and uninstall.
 
 ## Code quality
 
@@ -228,6 +246,11 @@ strings).
 See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 Highlights:
 
+- **v1.0.27-beta** — Fixes backups (v1.0.26 broke the backup of every
+  activity). Grades shown and published on the assignment's own scale.
+  Availability per category/course. Proposals and audit log included
+  in backups with user data. Tested on Moodle 5.1 and 5.2.
+- **v1.0.26-beta** — Assignment configuration included in backups.
 - **v1.0.17-beta** — Brazilian Portuguese (`pt_br`), Catalan (`ca`)
   and French (`fr`) translations. Full key parity (194 strings each).
 - **v1.0.16-beta** — The third action on the review form is now a
@@ -279,7 +302,6 @@ GPL-3.0+.
 
 ## Support
 
-- Issues: https://github.com/HernanDiaz/moodle-local_aigrader/issues
-- The plugin is maintained by the original author. Commercial support
-  contracts, custom rubric design, and managed-LLM-endpoint hosting
-  are available — contact the maintainer through the repo.
+- Bugs and ideas for new features:
+  https://github.com/HernanDiaz/moodle-local_aigrader/issues/new/choose
+  — every suggestion is read.

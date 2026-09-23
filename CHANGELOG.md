@@ -5,6 +5,57 @@ here. The format follows [Keep a Changelog](https://keepachangelog.com/),
 versions follow Moodle's `YYYYMMDDXX` plugin-version convention with a
 parallel semantic-style release name.
 
+## [v1.0.27-beta] — 2026-09-23
+
+**Upgrade recommended for every site running v1.0.26**: its backup code
+broke the backup and the duplication of *any* activity, not only
+assignments.
+
+### Fixed
+
+- **Backups** — v1.0.26 crashed every activity backup ("Call to a
+  member function get_element() on string"), so course backups, course
+  imports and "Duplicate" on any activity failed on sites with the
+  plugin installed. The backup/restore classes are rewritten and
+  covered by PHPUnit tests that run real backups:
+  - the per-assignment configuration travels with every backup,
+    duplication and import;
+  - when the backup includes user data, the AI proposals, teacher
+    drafts and decisions and the audit log travel too, re-pointed at
+    the restored submissions and users;
+  - backups of other activities are unaffected.
+- **Grades on the assignment's own scale** — the AI proposes on 0-10
+  internally, but the grade is now shown, edited and published on the
+  assignment's scale: "80 / 100" for an assignment out of 100, the
+  scale item for assignments graded with a scale. Before, 8/10 was
+  published as 8/100. Assignments without a grade publish feedback only.
+- **Rubrics and marking guides** — publishing from AI Grader Pro is
+  refused (it would bypass the rubric); the review page links to the
+  assignment grader instead, and bulk approve skips those assignments.
+- **Bulk approve & publish** crashed; fixed. A teacher's saved draft is
+  now what gets published.
+- **Model override removed** — the per-assignment model field had no
+  effect (Moodle's AI Subsystem picks the model). The audit log now
+  records the provider and model that were actually used.
+- **Capability check** — `local/aigrader:configure` is now required to
+  enable AI grading on an assignment; it was declared but not checked.
+  Saving an assignment without our fields no longer resets its
+  AI Grader Pro configuration.
+
+### Added
+
+- **Where AI Grader Pro is available** (Site administration → Plugins →
+  Local plugins → AI Grader Pro): restrict the plugin to some course
+  categories (subcategories included) and/or courses by short name.
+  Empty means every course, as before.
+- CI runs on Moodle 4.5, 5.0, 5.1 and 5.2, plus the development branch.
+
+### Documentation
+
+- SECURITY.md said the audit log stored only a hash of the prompt; it
+  stores the full prompt, as the privacy provider declares. Corrected,
+  together with the description of GDPR deletions.
+
 ## [v1.0.26-beta] — 2026-05-17
 
 ### Fixed

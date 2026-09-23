@@ -25,9 +25,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_aigrader';     // Frankenstyle name.
-// v1.0.26-beta: Backup/Restore API support — per-assignment config travels
-// with course backups (fixes high-severity finding from Plugin Directory peer review).
-$plugin->version   = 2026051721;           // YYYYMMDDXX format.
+// v1.0.27-beta: backup hotfix, grades on the assignment's scale, availability
+// per category/course. See CHANGELOG.md.
+$plugin->version   = 2026092300;           // YYYYMMDDXX format.
 $plugin->requires  = 2024100700;           // Moodle 4.5.0 minimum.
 $plugin->maturity  = MATURITY_BETA;        // Pilot-ready.
-$plugin->release   = 'v1.0.26-beta';
+$plugin->release   = 'v1.0.27-beta';

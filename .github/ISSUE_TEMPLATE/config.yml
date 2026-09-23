@@ -4,11 +4,8 @@ contact_links:
     url: https://github.com/HernanDiaz/moodle-local_aigrader/blob/main/SECURITY.md
     about: Please report security issues privately via email — do NOT open a public issue.
   - name: Moodle core or AI Subsystem bug
-    url: https://moodle.org/security
-    about: Bugs in Moodle core, mod_assign, or any `aiprovider_*` plugin go to Moodle's security team.
+    url: https://tracker.moodle.org
+    about: Bugs in Moodle core, mod_assign, or any `aiprovider_*` plugin go to the Moodle tracker.
   - name: Plugin documentation
     url: https://github.com/HernanDiaz/moodle-local_aigrader/blob/main/README.md
-    about: Read the README, TESTPLAN, and PLUGIN_DIRECTORY_LISTING before filing a question.
-  - name: Discussion (open-ended question)
-    url: https://github.com/HernanDiaz/moodle-local_aigrader/discussions
-    about: For questions, ideas, or anything that's not yet a clear bug or feature request.
+    about: Read the README and TESTPLAN before filing a question.

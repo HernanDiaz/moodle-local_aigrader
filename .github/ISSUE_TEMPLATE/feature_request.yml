@@ -6,11 +6,11 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for the suggestion! A few things worth checking before you file:
+        Thanks for the suggestion! Every idea is read, and the most requested ones
+        shape the next releases. Two things worth knowing before you file:
 
-        - The plugin is intentionally small and opinionated. We say no often.
-          See [`CONTRIBUTING.md`](../../CONTRIBUTING.md) ("What we are unlikely to accept")
-          to save your time.
+        - The plugin is intentionally small and focused. See
+          [`CONTRIBUTING.md`](../../CONTRIBUTING.md) ("What we are unlikely to accept").
         - In particular: **auto-publish features** (anything that lets the AI write
           a grade without an explicit teacher click) are out of scope and will be
           declined — the human-in-the-loop guarantee is the plugin's core contract.
