@@ -23,10 +23,12 @@ on:
 jobs:
   test:
     runs-on: ubuntu-22.04
+    # The next Moodle (main) is still in development: report it, don't block on it.
+    continue-on-error: ${{ matrix.experimental }}
 
     services:
       postgres:
-        image: postgres:14
+        image: postgres:${{ matrix.pgsql }}
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -39,7 +41,7 @@ jobs:
           --health-retries=8
 
       mariadb:
-        image: mariadb:10.11
+        image: mariadb:${{ matrix.mariadb }}
         env:
           MYSQL_USER: 'root'
           MYSQL_ALLOW_EMPTY_PASSWORD: "true"
@@ -56,20 +58,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 4.5 is the minimum the plugin requires (see version.php).
-        # MOODLE_405_STABLE = Moodle 4.5 LTS line, MOODLE_500_STABLE = 5.0
-        # (next major). We test both so the plugin stays compatible
-        # forward as well.
-        php: ['8.1', '8.2', '8.3']
-        moodle-branch: ['MOODLE_405_STABLE', 'MOODLE_500_STABLE']
-        database: ['pgsql', 'mariadb']
-        exclude:
-          # PHP 8.3 only required for Moodle 5.0+.
-          - php: '8.3'
-            moodle-branch: 'MOODLE_405_STABLE'
-          # Moodle 5.0 dropped PHP 8.1.
-          - php: '8.1'
-            moodle-branch: 'MOODLE_500_STABLE'
+        # Every supported Moodle branch from 4.5 LTS (the minimum in
+        # version.php) to the one in development, each with its lowest
+        # PHP on PostgreSQL and its highest PHP on MariaDB. Database
+        # versions follow each branch's admin/environment.xml minimum:
+        # 5.1 needs PostgreSQL 15, 5.2 needs 16, 5.3 needs 17 and
+        # MariaDB 11.4.
+        include:
+          - {moodle-branch: 'MOODLE_405_STABLE', php: '8.1', database: 'pgsql', pgsql: '14', mariadb: '10.11', experimental: false}
+          - {moodle-branch: 'MOODLE_405_STABLE', php: '8.3', database: 'mariadb', pgsql: '14', mariadb: '10.11', experimental: false}
+          - {moodle-branch: 'MOODLE_500_STABLE', php: '8.2', database: 'pgsql', pgsql: '14', mariadb: '10.11', experimental: false}
+          - {moodle-branch: 'MOODLE_500_STABLE', php: '8.4', database: 'mariadb', pgsql: '14', mariadb: '10.11', experimental: false}
+          - {moodle-branch: 'MOODLE_501_STABLE', php: '8.2', database: 'pgsql', pgsql: '15', mariadb: '10.11', experimental: false}
+          - {moodle-branch: 'MOODLE_501_STABLE', php: '8.4', database: 'mariadb', pgsql: '15', mariadb: '10.11', experimental: false}
+          - {moodle-branch: 'MOODLE_502_STABLE', php: '8.3', database: 'pgsql', pgsql: '16', mariadb: '10.11', experimental: false}
+          - {moodle-branch: 'MOODLE_502_STABLE', php: '8.4', database: 'mariadb', pgsql: '16', mariadb: '10.11', experimental: false}
+          - {moodle-branch: 'main', php: '8.3', database: 'pgsql', pgsql: '17', mariadb: '11.4', experimental: true}
 
     steps:
       - name: Check out plugin code
