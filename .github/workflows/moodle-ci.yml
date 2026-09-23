@@ -62,8 +62,10 @@ jobs:
         # version.php) to the one in development, each with its lowest
         # PHP on PostgreSQL and its highest PHP on MariaDB. Database
         # versions follow each branch's admin/environment.xml minimum:
-        # 5.1 needs PostgreSQL 15, 5.2 needs 16, 5.3 needs 17 and
-        # MariaDB 11.4.
+        # 5.1 needs PostgreSQL 15, 5.2 needs 16, 5.3 needs 17. The main
+        # job runs on PostgreSQL only; its MariaDB service stays on 10.11
+        # because the 11.x images no longer ship the mysqladmin used by
+        # the health check.
         include:
           - {moodle-branch: 'MOODLE_405_STABLE', php: '8.1', database: 'pgsql', pgsql: '14', mariadb: '10.11', experimental: false}
           - {moodle-branch: 'MOODLE_405_STABLE', php: '8.3', database: 'mariadb', pgsql: '14', mariadb: '10.11', experimental: false}
@@ -73,7 +75,7 @@ jobs:
           - {moodle-branch: 'MOODLE_501_STABLE', php: '8.4', database: 'mariadb', pgsql: '15', mariadb: '10.11', experimental: false}
           - {moodle-branch: 'MOODLE_502_STABLE', php: '8.3', database: 'pgsql', pgsql: '16', mariadb: '10.11', experimental: false}
           - {moodle-branch: 'MOODLE_502_STABLE', php: '8.4', database: 'mariadb', pgsql: '16', mariadb: '10.11', experimental: false}
-          - {moodle-branch: 'main', php: '8.3', database: 'pgsql', pgsql: '17', mariadb: '11.4', experimental: true}
+          - {moodle-branch: 'main', php: '8.3', database: 'pgsql', pgsql: '17', mariadb: '10.11', experimental: true}
 
     steps:
       - name: Check out plugin code
