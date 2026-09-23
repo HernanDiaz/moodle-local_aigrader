@@ -63,6 +63,33 @@ final class availability_test extends \advanced_testcase {
     }
 
     /**
+     * The admin setting offers the site's categories and saving one of them
+     * restricts the plugin to it.
+     *
+     * Regression test: v1.0.27 as first tagged offered the strings of the
+     * callable instead of the categories.
+     */
+    public function test_admin_setting_lists_and_saves_categories(): void {
+        global $CFG;
+        require_once($CFG->libdir . '/adminlib.php');
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $category = $this->getDataGenerator()->create_category(['name' => 'Pilot faculty']);
+        $incategory = $this->getDataGenerator()->create_course(['category' => $category->id]);
+        $elsewhere = $this->getDataGenerator()->create_course();
+
+        $page = admin_get_root(true, false)->locate('local_aigrader_settings');
+        $setting = $page->settings->local_aigraderallowedcategories;
+        $this->assertTrue($setting->load_choices());
+        $this->assertArrayHasKey($category->id, $setting->choices);
+        $this->assertStringContainsString('Pilot faculty', $setting->choices[$category->id]);
+
+        $this->assertSame('', $setting->write_setting([$category->id]));
+        $this->assertTrue(availability::is_available_in_course($incategory));
+        $this->assertFalse(availability::is_available_in_course($elsewhere));
+    }
+
+    /**
      * Courses can be allowed by short name, case-insensitively, one per line.
      */
     public function test_course_restriction_by_shortname(): void {

@@ -65,12 +65,15 @@ if ($hassiteconfig) {
         get_string('setting_availability_heading', 'local_aigrader'),
         get_string('setting_availability_heading_desc', 'local_aigrader')
     ));
+    // The category list is loaded only when the page is shown. It must be a
+    // Closure: an [class, method] array is also an array, and the setting
+    // would take its two strings as the choices.
     $settings->add(new admin_setting_configmultiselect(
         'local_aigrader/allowedcategories',
         get_string('setting_allowedcategories', 'local_aigrader'),
         get_string('setting_allowedcategories_desc', 'local_aigrader'),
         [],
-        [\local_aigrader\availability::class, 'get_category_choices']
+        fn(): array => \local_aigrader\availability::get_category_choices()
     ));
     $settings->add(new admin_setting_configtextarea(
         'local_aigrader/allowedcourses',
