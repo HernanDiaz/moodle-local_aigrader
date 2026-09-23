@@ -218,7 +218,7 @@ old logs stay parseable.
   (`--- CRITERIA ---`, `--- SUBMISSION ---`) to help small models
   separate them.
 - `metadata` — `submissionid`, `assignid`, `courseid`, `studentid`,
-  `model_override`, etc. Used by the manager to update rows after
+  `language`, etc. Used by the manager to update rows after
   the call; never sent to the LLM.
 
 The output is a `built_prompt` value object whose `hash()` is the
@@ -246,7 +246,9 @@ Per-assignment config. Unique on `assignid`. Holds:
 - `source` — `manual` | `rubric_imported` | `rubric_edited` (the
   rubric importer pre-fills criteria from Moodle's advanced grading
   rubric when present).
-- `model_override`, `language_override` — per-assignment escape hatches.
+- `language_override` — per-assignment feedback language.
+- `model_override` — unused since v1.0.27 (Moodle's AI Subsystem cannot
+  choose a model per request); kept so older backups restore cleanly.
 
 ### `local_aigrader_submission`
 

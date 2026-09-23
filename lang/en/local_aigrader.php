@@ -58,8 +58,6 @@ Tone: constructive and specific, in Spanish.';
 
 $string['form_criteria_imported_notice'] = 'Criteria pre-filled from the rubric configured under "Grade > Advanced grading". You may edit them before enabling AI grading.';
 
-$string['form_model_override'] = 'Model override (optional)';
-$string['form_model_override_help'] = 'If set, this assignment uses this specific model instead of the default configured in the AI provider. Useful when you want a more capable (or cheaper) model for a particular task. Leave empty to use the global default.';
 
 $string['form_language_override'] = 'Feedback language (optional)';
 $string['form_language_override_help'] = 'If set, AI feedback for this assignment will be in this language instead of the course language. Leave on "Auto" to use the course\'s language.';

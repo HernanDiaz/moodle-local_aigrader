@@ -58,8 +58,6 @@ Ton : constructif et spécifique, en français.';
 
 $string['form_criteria_imported_notice'] = 'Critères pré-remplis depuis la grille configurée dans « Évaluation > Évaluation avancée ». Vous pouvez les modifier avant d\'activer l\'évaluation par IA.';
 
-$string['form_model_override'] = 'Modèle (optionnel)';
-$string['form_model_override_help'] = 'Si défini, ce devoir utilise ce modèle spécifique au lieu de celui par défaut du fournisseur IA. Utile lorsque vous voulez un modèle plus performant (ou moins cher) pour un devoir précis. Laissez vide pour utiliser le modèle par défaut global.';
 
 $string['form_language_override'] = 'Langue du feedback (optionnel)';
 $string['form_language_override_help'] = 'Si défini, le feedback de l\'IA pour ce devoir sera dans cette langue au lieu de la langue du cours. Laissez sur « Auto » pour utiliser la langue du cours.';

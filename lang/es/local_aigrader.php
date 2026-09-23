@@ -58,8 +58,6 @@ Tono: constructivo y específico, en español.';
 
 $string['form_criteria_imported_notice'] = 'Criterios pre-rellenados desde la rúbrica configurada en "Calificación > Calificación avanzada". Puedes editarlos antes de habilitar la calificación IA.';
 
-$string['form_model_override'] = 'Modelo (opcional)';
-$string['form_model_override_help'] = 'Si lo defines, esta tarea usa este modelo específico en lugar del default del provider IA. Útil cuando quieres un modelo más capaz (o más barato) para una tarea concreta. Déjalo vacío para usar el default global.';
 
 $string['form_language_override'] = 'Idioma del feedback (opcional)';
 $string['form_language_override_help'] = 'Si lo defines, el feedback de la IA para esta tarea irá en este idioma en lugar del idioma del curso. Déjalo en "Auto" para usar el idioma del curso.';

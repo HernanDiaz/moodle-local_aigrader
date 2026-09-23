@@ -73,7 +73,6 @@ class manager {
             // 1. Build prompt (throws if config missing or extraction fails).
             $prompt = builder::build_for_submission($submissionid);
             $result->prompt_hash = $prompt->hash();
-            $result->llm_model   = (string) ($prompt->metadata['model_override'] ?? '');
 
             // 2. Find/create the local_aigrader_submission row in pending state.
             $submrecid = self::upsert_submission_row($prompt, status: 'pending_ai');
@@ -106,6 +105,12 @@ class manager {
 
             $result->duration_ms = (int) round((microtime(true) - $start) * 1000);
 
+            // Record which provider actually handled the request, and its
+            // model when that can be known, for the audit log.
+            $origin = self::resolve_ai_origin((int) $USER->id);
+            $result->llm_provider = $origin['provider'] ?? '';
+            $result->llm_model = $origin['model'] ?? '';
+
             // 5. Check AI Subsystem success.
             if (!$response->get_success()) {
                 $err = trim(($response->get_errorcode() ?? '') . ': ' . ($response->get_errormessage() ?? ''));
@@ -113,7 +118,7 @@ class manager {
                     $err = 'AI Subsystem call failed (no error message provided)';
                 }
                 self::mark_submission_error($submrecid, $err);
-                $result->log_record_id = self::log_action('grade', $prompt, null, $response, $err, $result->duration_ms);
+                $result->log_record_id = self::log_action('grade', $prompt, null, $response, $err, $result);
                 $result->mark_error($err);
                 return $result;
             }
@@ -123,23 +128,13 @@ class manager {
             $result->tokens_input  = (int) ($data['prompttokens'] ?? 0);
             $result->tokens_output = (int) ($data['completiontokens'] ?? 0);
 
-            // The openai provider response does not include 'model' in 4.5;
-            // Read it from the provider's configured model setting instead.
-            if (empty($result->llm_model)) {
-                $result->llm_model = (string) get_config(
-                    'aiprovider_openai',
-                    'action_generate_text_model'
-                );
-            }
-            $result->llm_provider = 'openai'; // We use the openai provider (possibly pointed at Groq).
-
             // 6. Parse the LLM response into a structured proposal.
             $proposal = output_parser::parse($responsetext);
 
             if (!$proposal->success) {
                 $err = 'parse_error: ' . $proposal->error;
                 self::mark_submission_error($submrecid, $err);
-                $result->log_record_id = self::log_action('grade', $prompt, $proposal, $response, $err, $result->duration_ms);
+                $result->log_record_id = self::log_action('grade', $prompt, $proposal, $response, $err, $result);
                 $result->proposal = $proposal;
                 $result->mark_error($err);
                 return $result;
@@ -158,7 +153,7 @@ class manager {
             ]);
 
             // 8. Log the action.
-            $result->log_record_id = self::log_action('grade', $prompt, $proposal, $response, null, $result->duration_ms);
+            $result->log_record_id = self::log_action('grade', $prompt, $proposal, $response, null, $result);
 
             $result->proposal = $proposal;
             $result->mark_success();
@@ -170,7 +165,7 @@ class manager {
                 self::mark_submission_error($submrecid, $msg);
             }
             if ($prompt !== null) {
-                $result->log_record_id = self::log_action('grade', $prompt, null, null, $msg, $result->duration_ms);
+                $result->log_record_id = self::log_action('grade', $prompt, null, null, $msg, $result);
             }
             $result->mark_error($msg);
             return $result;
@@ -277,11 +272,11 @@ class manager {
      * Write an entry to local_aigrader_log. Returns its id.
      *
      * @param string $action Audit action: grade | regrade | edit | approve | save_draft | reject.
-     * @param built_prompt $prompt The built prompt (used for hash, model, submission metadata).
+     * @param built_prompt $prompt The built prompt (used for hash and submission metadata).
      * @param parsed_proposal|null $proposal Parsed result, or null if the call failed before parse.
      * @param object|null $response Raw `\core_ai\aiactions\response` (or null on early failure).
      * @param string|null $error Error message if the action failed, else null.
-     * @param int $durationms Wall-clock duration of the AI call in milliseconds.
+     * @param grading_result $result Result so far: duration, and provider / model when known.
      * @return int Inserted row id from local_aigrader_log.
      */
     private static function log_action(
@@ -290,7 +285,7 @@ class manager {
         ?parsed_proposal $proposal,
         ?object $response,
         ?string $error,
-        int $durationms
+        grading_result $result
     ): int {
         global $DB, $USER;
 
@@ -298,30 +293,21 @@ class manager {
 
         $data = $response ? $response->get_response_data() : [];
 
-        // Resolve model name: API response > assignment override > provider default.
-        $modelname = (string) ($data['model'] ?? '');
-        if ($modelname === '') {
-            $modelname = (string) ($prompt->metadata['model_override'] ?? '');
-        }
-        if ($modelname === '') {
-            $modelname = (string) get_config('aiprovider_openai', 'action_generate_text_model');
-        }
-
         $rec = (object) [
             'submissionid'      => (int) $prompt->metadata['submissionid'],
             'userid'            => (int) $USER->id,
             'studentid'         => (int) $prompt->metadata['studentid'],
             'courseid'          => (int) $prompt->metadata['courseid'],
             'action'            => $action,
-            'llm_provider'      => 'openai',
-            'llm_model'         => $modelname,
+            'llm_provider'      => $result->llm_provider !== '' ? \core_text::substr($result->llm_provider, 0, 64) : null,
+            'llm_model'         => $result->llm_model !== '' ? \core_text::substr($result->llm_model, 0, 128) : null,
             'prompt_hash'       => $prompt->hash(),
             'prompt_text'       => $prompt->system_message . "\n\n" . $prompt->user_message,
             'response_json'     => $proposal ? $proposal->as_json() : ($response ? json_encode($data) : null),
             'tokens_input'      => (int) ($data['prompttokens'] ?? 0),
             'tokens_output'     => (int) ($data['completiontokens'] ?? 0),
             'cost_usd'          => 0.0,
-            'duration_ms'       => $durationms,
+            'duration_ms'       => $result->duration_ms,
             'proposed_grade'    => $proposal && $proposal->success ? $proposal->grade : null,
             'final_grade'       => null,
             'teacher_edits'     => null,
@@ -338,5 +324,47 @@ class manager {
         }
 
         return (int) $DB->insert_record('local_aigrader_log', $rec);
+    }
+
+    /**
+     * Find which AI provider processed the user's latest generate_text
+     * action, and which model it used when that can be known.
+     *
+     * Moodle 4.5 records the provider in ai_action_register but not the
+     * model, so the model is taken from that provider's configured default.
+     * If a Moodle version records the model per action, that value wins.
+     * When the model cannot be determined it is left empty rather than
+     * guessed: the audit log must never name a model that was not used.
+     *
+     * @param int $userid User who made the request.
+     * @return array Keys 'provider' and 'model', each a string or null.
+     */
+    private static function resolve_ai_origin(int $userid): array {
+        global $DB;
+
+        $records = $DB->get_records(
+            'ai_action_register',
+            ['actionname' => 'generate_text', 'userid' => $userid],
+            'id DESC',
+            '*',
+            0,
+            1
+        );
+        $record = reset($records);
+        if (!$record) {
+            return ['provider' => null, 'model' => null];
+        }
+
+        $provider = (string) $record->provider;
+        $model = null;
+        if (!empty($record->model)) {
+            $model = (string) $record->model;
+        } else {
+            $configured = get_config($provider, 'action_generate_text_model');
+            if (is_string($configured) && $configured !== '') {
+                $model = $configured;
+            }
+        }
+        return ['provider' => $provider, 'model' => $model];
     }
 }

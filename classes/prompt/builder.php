@@ -145,7 +145,6 @@ EOT;
             'courseid'          => (int) $assign->course,
             'studentid'         => (int) $submission->userid,
             'language'          => $language,
-            'model_override'    => $config->model_override,
             'submission_format' => $extraction->format,
             'submission_chars'  => $extraction->chars,
             'extraction_warnings' => $extraction->warnings,

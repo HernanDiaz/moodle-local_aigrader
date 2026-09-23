@@ -9,7 +9,7 @@
         <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 = AI Grader Pro active on this assignment."/>
         <FIELD NAME="criteria_text" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Evaluation criteria written by the teacher in natural language. Required to enable."/>
         <FIELD NAME="source" TYPE="char" LENGTH="32" NOTNULL="true" DEFAULT="manual" SEQUENCE="false" COMMENT="Origin of criteria_text: manual | rubric_imported | rubric_edited"/>
-        <FIELD NAME="model_override" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false" COMMENT="If set, overrides the AI Subsystem default model for this assignment."/>
+        <FIELD NAME="model_override" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false" COMMENT="Unused since v1.0.27: the AI Subsystem cannot select a model per request. Kept so older course backups restore cleanly."/>
         <FIELD NAME="language_override" TYPE="char" LENGTH="8" NOTNULL="false" SEQUENCE="false" COMMENT="If set, overrides course language for feedback (ISO code, e.g. es, en, pt)."/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="FK to {user}.id of teacher who last edited config."/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

@@ -58,8 +58,6 @@ Tom: construtivo e específico, em português.';
 
 $string['form_criteria_imported_notice'] = 'Critérios pré-preenchidos a partir da rubrica configurada em "Avaliação > Avaliação avançada". Você pode editá-los antes de habilitar a avaliação por IA.';
 
-$string['form_model_override'] = 'Modelo (opcional)';
-$string['form_model_override_help'] = 'Se definido, esta tarefa usa este modelo específico em vez do padrão do provedor de IA. Útil quando você quer um modelo mais capaz (ou mais barato) para uma tarefa específica. Deixe em branco para usar o padrão global.';
 
 $string['form_language_override'] = 'Idioma do feedback (opcional)';
 $string['form_language_override_help'] = 'Se definido, o feedback da IA para esta tarefa será neste idioma em vez do idioma do curso. Deixe em "Auto" para usar o idioma do curso.';

@@ -58,8 +58,6 @@ To: constructiu i específic, en català.';
 
 $string['form_criteria_imported_notice'] = 'Criteris pre-omplerts des de la rúbrica configurada a "Qualificació > Qualificació avançada". Pots editar-los abans d\'habilitar la qualificació IA.';
 
-$string['form_model_override'] = 'Model (opcional)';
-$string['form_model_override_help'] = 'Si el defineixes, aquesta tasca usa aquest model específic en lloc del per defecte del proveïdor IA. Útil quan vols un model més capaç (o més barat) per a una tasca concreta. Deixa-ho buit per usar el per defecte global.';
 
 $string['form_language_override'] = 'Idioma del feedback (opcional)';
 $string['form_language_override_help'] = 'Si el defineixes, el feedback de la IA per a aquesta tasca anirà en aquest idioma en lloc de l\'idioma del curs. Deixa-ho a "Auto" per usar l\'idioma del curs.';

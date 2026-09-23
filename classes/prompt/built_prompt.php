@@ -38,7 +38,7 @@ class built_prompt {
     /** @var string User-side message (criteria + brief + submission + output spec). */
     public string $user_message;
 
-    /** @var array<string,mixed> Metadata (submissionid, language, model_override...). */
+    /** @var array<string,mixed> Metadata (submissionid, assignid, language, submission_format...). */
     public array $metadata;
 
     /**

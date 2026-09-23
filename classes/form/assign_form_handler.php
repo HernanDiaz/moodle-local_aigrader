@@ -114,17 +114,6 @@ class assign_form_handler {
         $mform->addElement('hidden', self::FIELD_PREFIX . 'source', $source);
         $mform->setType(self::FIELD_PREFIX . 'source', PARAM_ALPHANUMEXT);
 
-        // Model override (optional).
-        $mform->addElement(
-            'text',
-            self::FIELD_PREFIX . 'model_override',
-            get_string('form_model_override', 'local_aigrader'),
-            ['maxlength' => 128, 'size' => 40]
-        );
-        $mform->setType(self::FIELD_PREFIX . 'model_override', PARAM_TEXT);
-        $mform->addHelpButton(self::FIELD_PREFIX . 'model_override', 'form_model_override', 'local_aigrader');
-        $mform->setDefault(self::FIELD_PREFIX . 'model_override', $existing->model_override ?? '');
-
         // Language override (optional).
         $langoptions = ['' => get_string('form_lang_auto', 'local_aigrader')];
         foreach (get_string_manager()->get_list_of_translations() as $code => $name) {
@@ -141,7 +130,6 @@ class assign_form_handler {
 
         // Only show the rest of fields if enabled. Cosmetic hideIf.
         $mform->hideIf(self::FIELD_PREFIX . 'criteria', self::FIELD_PREFIX . 'enabled', 'notchecked');
-        $mform->hideIf(self::FIELD_PREFIX . 'model_override', self::FIELD_PREFIX . 'enabled', 'notchecked');
         $mform->hideIf(self::FIELD_PREFIX . 'language_override', self::FIELD_PREFIX . 'enabled', 'notchecked');
     }
 
@@ -197,7 +185,6 @@ class assign_form_handler {
         $enabled = !empty($moduleinfo->{self::FIELD_PREFIX . 'enabled'}) ? 1 : 0;
         $criteria = trim($moduleinfo->{self::FIELD_PREFIX . 'criteria'} ?? '');
         $source = $moduleinfo->{self::FIELD_PREFIX . 'source'} ?? 'manual';
-        $modeloverride = trim($moduleinfo->{self::FIELD_PREFIX . 'model_override'} ?? '');
         $languageoverride = $moduleinfo->{self::FIELD_PREFIX . 'language_override'} ?? '';
 
         $existing = $DB->get_record('local_aigrader_assign', ['assignid' => $assignid]);
@@ -212,7 +199,10 @@ class assign_form_handler {
         $record->enabled = $enabled;
         $record->criteria_text = $criteria;
         $record->source = $source ?: 'manual';
-        $record->model_override = $modeloverride !== '' ? $modeloverride : null;
+        // The per-assignment model override was removed in v1.0.27: Moodle's AI
+        // subsystem cannot pick a model per request, so the value was never
+        // used. Clear any value left over from earlier versions.
+        $record->model_override = null;
         $record->language_override = $languageoverride !== '' ? $languageoverride : null;
         $record->usermodified = $USER->id;
         $record->timemodified = $now;

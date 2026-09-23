@@ -374,8 +374,7 @@ duplicated, restored on the same site, or imported on another site.
 1. Open a course with at least one assignment that has AI Grader
    Pro **enabled** and a non-trivial **Evaluation criteria** value
    (write something distinctive: "TEST-MARKER-2026 — evaluate
-   thesis clarity"), plus an optional **Model override**
-   (e.g. `gpt-4o-mini`) and **Feedback language** (`es`).
+   thesis clarity"), plus an optional **Feedback language** (`es`).
 2. *Course administration → Course reuse → Backup*. Tick
    "Include user data" if you want to test the full path; untick
    it for the minimal config-only path.
@@ -387,8 +386,7 @@ duplicated, restored on the same site, or imported on another site.
    - AI Grader Pro fieldset is **enabled**.
    - Evaluation criteria contains `TEST-MARKER-2026 — evaluate
      thesis clarity`.
-   - Model override and Feedback language carry the original
-     values.
+   - Feedback language carries the original value.
 6. Open the new course's AI Grader Pro manage page. **Expected**:
    loads without "AI Grader Pro is not enabled on this
    assignment" error.
