@@ -5,6 +5,43 @@ here. The format follows [Keep a Changelog](https://keepachangelog.com/),
 versions follow Moodle's `YYYYMMDDXX` plugin-version convention with a
 parallel semantic-style release name.
 
+## [v1.0.28-beta] — 2026-09-24
+
+### Added
+
+- **PowerPoint and OpenDocument** — `.pptx` presentations (slides in
+  presentation order, with speaker notes), `.odt` documents and `.odp`
+  presentations are read. Word, PowerPoint and OpenDocument files inside
+  a `.zip` submission are now read too; before, they were skipped as
+  binary files.
+- **Automatic grading when a student submits** — new per-assignment
+  option "Grade automatically when a student submits" (off by default).
+  Each submission queues the grading task, so the proposal is waiting
+  when the teacher opens the panel; the teacher still reviews and
+  publishes. It runs as the teacher who turned it on (or the site
+  administrator if that teacher can no longer use the plugin there),
+  queues one task per submission however many times the student saves,
+  and never replaces a proposal the teacher reviewed or published. The
+  README described this behaviour before it existed.
+- **Copy criteria from another assignment** — the assignment form lists
+  the assignments with criteria, in this course and in the teacher's
+  other courses where they can configure AI Grader Pro. "Copy" reloads
+  the form with the criteria and feedback language, to review before
+  saving.
+- **Student names kept out of the AI** — new site setting, on by default:
+  the student's name parts, email, username and ID number (all group
+  members for group submissions) are replaced with `[STUDENT]` in the
+  text and file names sent to the provider. Name parts are matched with
+  or without accents, as proper nouns or inside identifiers
+  (`practica_maria_garcia.docx`); lower-case common words that are also
+  surnames are left alone. The review page shows the replaced text, and
+  the prompt tells the AI not to penalise the placeholder.
+
+### Changed
+
+- The per-assignment setting travels with backups (`autograde` in the
+  configuration element; older backups restore with it off).
+
 ## [v1.0.27-beta] — 2026-09-23
 
 **Upgrade recommended for every site running v1.0.26**: its backup code

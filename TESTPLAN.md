@@ -450,6 +450,62 @@ decisions and audit log.
 
 ---
 
+## Scenario 20: PowerPoint, OpenDocument and office files inside a ZIP
+
+1. As a student, submit a `.pptx` with speaker notes on some slides.
+   Reorder a slide in PowerPoint before saving, so file order and slide
+   order differ.
+2. Grade it with AI and open **Submission as seen by the AI**.
+   **Expected**: one `--- Slide N ---` block per slide in the order
+   shown in PowerPoint, with `Speaker notes:` under the slides that
+   have them; no slide numbers or dates in the text.
+3. Repeat with an `.odt` written in LibreOffice (with a tracked change
+   and a comment) and an `.odp`. **Expected**: body text only (no deleted
+   text, no comments), slides split for the `.odp`.
+4. Submit a `.zip` with `report.docx`, `slides.pptx` and a `.py` file.
+   **Expected**: all three appear, each under its own `--- name (type) ---`
+   header.
+
+## Scenario 21: Automatic grading when a student submits
+
+1. Edit an assignment, enable AI Grader Pro, tick **Grade automatically
+   when a student submits**, save.
+2. As a student, submit (press "Submit assignment" if the assignment has
+   that button). **Expected**: the AI Grader Pro page shows the
+   submission as **Pending**; after the next cron run it shows the AI
+   proposal.
+3. Review and save the proposal (or publish it). Have the student
+   resubmit (reopen the submission if needed). **Expected**: the reviewed
+   proposal is not replaced; the teacher can re-grade by hand.
+4. Untick the option. **Expected**: new submissions are not graded until
+   the teacher clicks **Grade with AI**.
+
+## Scenario 22: Copy criteria from another assignment
+
+1. Edit an assignment without AI Grader Pro, tick **Enable…**, choose an
+   assignment in **Copy criteria from** and press **Copy**.
+   **Expected**: the form reloads with that assignment's criteria and
+   feedback language and a green "Criteria copied from…" notice; nothing
+   is saved yet.
+2. Save. **Expected**: the criteria are stored for this assignment.
+3. As a non-editing teacher of another course, check that assignments
+   of that course are not listed.
+
+## Scenario 23: Student names kept out of the AI
+
+1. As a student named e.g. "María José García", submit a document whose
+   cover page says "María José García", "MARIA GARCIA" and the student's
+   email, named `practica_maria_garcia.docx`, and mentioning the colour
+   "rosa" or "blanco" in lower case.
+2. Grade with AI and open **Submission as seen by the AI**.
+   **Expected**: `[STUDENT]` instead of the name, the email and in the
+   file name; the lower-case common words are unchanged. The audit log
+   (`mdl_local_aigrader_log.prompt_text`) contains the same replaced text.
+3. Untick **Keep student names out of the AI** in the site settings and
+   repeat. **Expected**: the name is sent as written.
+
+---
+
 ## What is intentionally **not** in this plan
 
 - **Automated coverage**: the flows above that can run without a

@@ -187,12 +187,23 @@ Per-format handlers live in `classes/extractor/`:
 - `text_extractor` — `.txt`, `.md`, plain source code (20+ languages
   by extension).
 - `docx_extractor` — `.docx` via direct ZIP+XML parsing (no LibreOffice).
+- `pptx_extractor` — `.pptx`, slides in the order of
+  `ppt/presentation.xml` (not file-name order) with speaker notes.
+- `odf_extractor` — `.odt` and `.odp` (`content.xml` body only, no
+  tracked deletions or comments; slides split for presentations).
 - `pdf_extractor` — `.pdf` up to 5 MB via vendored `smalot/pdfparser`
   (under `thirdparty/vendor/`, declared in `thirdpartylibs.xml`).
 - `ipynb_extractor` — Jupyter notebooks; strips outputs by default to
   avoid embedded base64 images bloating the prompt.
-- `zip_extractor` — recurses into ZIPs and dispatches each entry to
-  the right inner extractor.
+- `zip_extractor` — reads the entries of a ZIP: text and code as they
+  are, `.docx`/`.pptx`/`.odt`/`.odp` through their extractors.
+
+When the site setting `redactnames` is on (default), the dispatcher
+passes the final text and warnings through `name_redactor`, which
+replaces the student's name parts, email, username and ID number with
+`[STUDENT]`. It happens in the dispatcher so the prompt, the audit log
+and the review page's "Submission as seen by the AI" all show the same
+text.
 
 Each returns an `extraction_result` value object with `text`,
 `warnings`, `is_needs_review`, and `error`. The dispatcher aggregates
@@ -223,8 +234,8 @@ old logs stay parseable.
 
 The output is a `built_prompt` value object whose `hash()` is the
 SHA-256 of `system_message . "\n--- TASK ---\n" . user_message`. The
-hash is logged (not the raw prompt) so duplicate-prompt detection and
-caching can be added later without rewriting the audit table.
+hash is logged next to the full prompt so duplicate-prompt detection
+and caching can be added later without rewriting the audit table.
 
 Note: at runtime the system+user messages are concatenated again in
 `manager::grade_submission()` because Moodle 4.5's AI Subsystem
@@ -313,7 +324,13 @@ removed in v1.0.6).
 `classes\task\grade_submission` is a `\core\task\adhoc_task` that calls
 `manager::grade_submission()` for a single `submissionid` carried in
 its custom data. Enqueued by the bulk dispatcher (and by `retry.php`)
-when work needs to happen outside the request lifecycle.
+when work needs to happen outside the request lifecycle, and by
+`autograde::queue_for_submission()` from the observer of
+`\mod_assign\event\assessable_submitted` when the assignment has
+"Grade automatically when a student submits" on. That task runs as the
+teacher who saved the setting (the site admin if that teacher lost
+`local/aigrader:use`), is queued once per submission, and is not queued
+over a `teacher_reviewed` or `published` row.
 
 Failures are retried with Moodle's standard adhoc-task exponential
 backoff. After max retries the task is buried; the row stays in

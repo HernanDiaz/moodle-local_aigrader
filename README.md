@@ -7,7 +7,7 @@ edits if needed, and decides whether to publish. Nothing reaches the
 gradebook without an explicit teacher click.
 
 [![CI](https://github.com/HernanDiaz/moodle-local_aigrader/actions/workflows/moodle-ci.yml/badge.svg)](https://github.com/HernanDiaz/moodle-local_aigrader/actions/workflows/moodle-ci.yml)
-[![Tests](https://img.shields.io/badge/PHPUnit-111%20tests%20passing-brightgreen)](#tests)
+[![Tests](https://img.shields.io/badge/PHPUnit-130%20tests%20passing-brightgreen)](#tests)
 [![Code style](https://img.shields.io/badge/phpcs-0%20errors-brightgreen)](#code-quality)
 [![Languages](https://img.shields.io/badge/i18n-5%20languages-blue)](#features)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
@@ -20,9 +20,12 @@ gradebook without an explicit teacher click.
   edit page ("Eres profesor de la microcredencial de IA. Evalúa esta
   práctica final…"). No rigid rubric grid required — the LLM is good at
   reading nuanced prose.
-- When a student submits, the plugin extracts text from their files
-  (`.txt`, `.md`, `.docx`, `.ipynb`, `.zip`, `.pdf` up to 5 MB, plus
-  source-code files in 20+ languages), builds a prompt combining the
+- When the teacher clicks **Grade with AI** (for one or many
+  submissions), or as soon as a student submits if the teacher turned
+  on automatic grading, the plugin extracts text from the submission
+  (`.txt`, `.md`, `.docx`, `.pptx`, `.odt`, `.odp`, `.ipynb`, `.zip`,
+  `.pdf` up to 5 MB, plus source-code files in 20+ languages), replaces
+  the student's name with `[STUDENT]`, builds a prompt combining the
   teacher's criteria with the extracted content, and calls the
   configured LLM provider via Moodle's AI Subsystem.
 - The proposal — a grade, per-criterion scores, strengths, areas for
@@ -51,8 +54,19 @@ contains the teacher's `user.id`, never a system id.
 - 🧠 **Multi-LLM** via Moodle's AI Subsystem — OpenAI, Azure OpenAI,
   Groq, any provider that implements the AI provider contract.
 - 📄 **File-format coverage**: online text, plain text, Markdown, Word
-  (`.docx`), Jupyter notebooks (`.ipynb`), PDF (text-based, up to 5 MB),
-  ZIP archives (recursed), and 20+ source-code languages.
+  (`.docx`), PowerPoint (`.pptx`, with speaker notes), OpenDocument text
+  and presentations (`.odt`, `.odp`), Jupyter notebooks (`.ipynb`), PDF
+  (text-based, up to 5 MB), ZIP archives (including the office
+  documents inside them), and 20+ source-code languages.
+- ⚡ **Automatic grading on submission** (per assignment, off by
+  default): the proposal is waiting when the teacher opens the panel.
+  Proposals the teacher already reviewed or published are never
+  replaced.
+- 📋 **Copy criteria from another assignment** in the same course or
+  in another course the teacher teaches.
+- 🙈 **Student names kept out of the AI**: name, email, username and ID
+  number are replaced with `[STUDENT]` before anything is sent to the
+  provider, also in file names (site setting, on by default).
 - 🗜️ **Notebook truncation**: Jupyter outputs longer than 30 lines /
   1500 chars per cell get head+tail truncation with a marker. A Fashion-
   MNIST notebook with 50 epochs × 1875 batches still fits comfortably
@@ -88,7 +102,7 @@ contains the teacher's `user.id`, never a system id.
   teacher decisions and audit log.
 - 🛡️ **Privacy provider** implementing GDPR Art. 15 (data export),
   Art. 17 (deletion) and the AI Act Annex III audit trail.
-- ✅ **Tested**: 111 PHPUnit tests + 14 Behat scenarios, on Moodle 4.5,
+- ✅ **Tested**: 130 PHPUnit tests + 16 Behat scenarios, on Moodle 4.5,
   5.0, 5.1 and 5.2 in CI.
 
 ## Requirements
@@ -143,8 +157,9 @@ empty to make it available in every course.
 
 Open any assignment → edit settings → expand **AI Grader Pro**:
 
-- Tick **Enable AI Grader Pro on this assignment**.
-- Write your **Evaluation criteria** in plain prose. Be specific.
+- Tick **Enable AI-assisted grading for this assignment**.
+- Write your **Evaluation criteria** in plain prose, or use **Copy
+  criteria from** to start from another assignment's. Be specific.
   Example:
 
   ```
@@ -160,21 +175,26 @@ Open any assignment → edit settings → expand **AI Grader Pro**:
   - ...
   ```
 
+- Optionally tick **Grade automatically when a student submits**.
 - Save the assignment.
 
 ### 4. Triggering grading
 
-When a student submits, the plugin enqueues an adhoc task that calls
-the LLM on the next cron tick (≤60 s on a healthy site). The teacher
-can also trigger grading manually from the **AI Grader Pro** tab on the
-assignment.
+From the **AI Grader Pro** page of the assignment, click **Grade with
+AI** on a submission, or select several and use the bulk action (more
+than 5 are queued as background tasks). With **Grade automatically when
+a student submits**, each submission queues an adhoc task that calls
+the LLM on the next cron run (≤60 s on a healthy site); the task runs
+as the teacher who turned the option on.
 
 ## Usage flow
 
 1. Student submits files (or online text) as usual.
-2. Plugin enqueues `\local_aigrader\task\grade_submission`.
-3. Cron runs it: extract → build prompt → call LLM → parse response →
-   store proposal with `status = 'ai_proposed'`.
+2. The teacher clicks **Grade with AI**, or, with automatic grading on,
+   the plugin enqueues `\local_aigrader\task\grade_submission`.
+3. The plugin extracts the text, replaces the student's name, builds the
+   prompt, calls the LLM, parses the response and stores the proposal
+   with `status = 'ai_proposed'`.
 4. Teacher visits the **AI Grader Pro** tab, sees the list of proposals.
 5. Teacher clicks **Revisar →**, sees the LLM's grade, strengths,
    improvements, justification. All editable.
@@ -197,7 +217,11 @@ plain text, including code) and the teacher's evaluation criteria to
 the LLM provider configured in Moodle's AI Subsystem. The provider may
 process this in a jurisdiction other than the EU depending on the
 institution's choice; the site administrator is responsible for signing
-a DPA with the chosen provider.
+a DPA with the chosen provider. By default the student's name, email,
+username and ID number are replaced with `[STUDENT]` before the text is
+sent, also in file names (setting **Keep student names out of the
+AI**). Names written in other forms, such as initials or nicknames, can
+still get through.
 
 The plugin's Privacy provider implements:
 
@@ -223,12 +247,13 @@ vendor/bin/phpunit --testsuite local_aigrader_testsuite
 vendor/bin/behat --tags @local_aigrader
 ```
 
-Current status: 111 PHPUnit tests + 14 Behat scenarios, all passing.
+Current status: 130 PHPUnit tests + 16 Behat scenarios, all passing.
 
 For manual end-to-end smoke testing (after an upgrade, or during
-peer review), see [TESTPLAN.md](TESTPLAN.md) — 19 scenarios walking
+peer review), see [TESTPLAN.md](TESTPLAN.md) — 23 scenarios walking
 through install, configure, grade, publish, bulk, filter, error
-paths, privacy export, backup/restore and uninstall.
+paths, privacy export, backup/restore, file formats, automatic
+grading, copying criteria, name removal and uninstall.
 
 ## Code quality
 
@@ -246,6 +271,10 @@ strings).
 See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 Highlights:
 
+- **v1.0.28-beta** — PowerPoint and OpenDocument files (also inside
+  ZIPs). Automatic grading when a student submits. Copy criteria from
+  another assignment. Student names replaced with `[STUDENT]` before
+  anything is sent to the AI.
 - **v1.0.27-beta** — Fixes backups (v1.0.26 broke the backup of every
   activity). Grades shown and published on the assignment's own scale.
   Availability per category/course. Proposals and audit log included

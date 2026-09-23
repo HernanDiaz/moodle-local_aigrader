@@ -25,9 +25,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_aigrader';     // Frankenstyle name.
-// v1.0.27-beta: backup hotfix, grades on the assignment's scale, availability
-// per category/course. See CHANGELOG.md.
-$plugin->version   = 2026092300;           // YYYYMMDDXX format.
+// v1.0.28-beta: PPTX/ODT/ODP, automatic grading on submission, copy criteria,
+// student names kept out of the prompt. See CHANGELOG.md.
+$plugin->version   = 2026092401;           // YYYYMMDDXX format.
 $plugin->requires  = 2024100700;           // Moodle 4.5.0 minimum.
 $plugin->maturity  = MATURITY_BETA;        // Pilot-ready.
-$plugin->release   = 'v1.0.27-beta';
+$plugin->release   = 'v1.0.28-beta';
