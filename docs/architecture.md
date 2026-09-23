@@ -265,10 +265,10 @@ text, prompt hash, model, provider, token counts, cost, duration,
 proposed and final grades, and the teacher_edits diff JSON. This is
 the table compliance officers read.
 
-The `prompt_text` column will be encrypted at-rest in v0.3
-(MariaDB transparent encryption + per-deployment key); for now it's
-plain so dev environments stay easy. The hash column is the durable
-identity of a prompt across encryption changes.
+The `prompt_text` column is stored in plain text, like the submission
+itself in mod_assign. Sites that need at-rest encryption can use their
+database's transparent encryption. The hash column is the durable
+identity of a prompt.
 
 ## 8. The privacy provider
 
@@ -281,12 +281,11 @@ identity of a prompt across encryption changes.
   `final_grader` / `userid` and students as `studentid`).
 - **`export_user_data()`** — exports a per-user JSON tree under the
   module subcontext, with one section per table.
-- **`delete_data_for_*()`** — destructive deletion for GDPR Article 17
-  requests. The audit log is preserved as required for high-risk AI
-  systems EXCEPT for personally identifying free-text fields, which
-  are scrubbed (`prompt_text` is anonymised to "[deleted by GDPR
-  request on YYYY-MM-DD]"; the hash, model, token counts, duration
-  and grade columns are retained).
+- **`delete_data_for_*()`** — deletion for GDPR Article 17 requests.
+  For a student, their proposal rows and audit log rows (prompt text
+  included) are deleted. For a teacher, the rows are kept and the
+  teacher is anonymised (`userid`, `final_grader`, `usermodified` set
+  to 0), so the grading history of other people survives.
 
 Test coverage lives in `tests/privacy/provider_test.php`.
 
@@ -418,11 +417,11 @@ they don't get "fixed" by accident.
   refactor that left it null (e.g. "system auto-publish if confidence
   ≥ 0.95") would break the contract — and the privacy export would
   no longer be able to attribute the grade to a person.
-- **Why the audit log keeps `prompt_text` in plaintext today?**
-  Trade-off between developer ergonomics and at-rest encryption
-  effort. The hash is the durable identity; the body will be moved
-  to an encrypted column in v0.3. Pilots that need encryption now
-  can use MariaDB / PostgreSQL TDE.
+- **Why the audit log keeps `prompt_text` in plaintext?** The
+  student's text already sits in plain text in mod_assign's own
+  tables; encrypting only our copy would add key management without
+  changing the exposure. Sites that need encryption can use MariaDB /
+  PostgreSQL TDE.
 
 ## 15. Where to start when porting
 

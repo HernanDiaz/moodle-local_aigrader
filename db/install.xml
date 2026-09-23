@@ -69,7 +69,7 @@
         <FIELD NAME="llm_provider" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="Moodle AI Subsystem provider name (openai, azureai, ...)."/>
         <FIELD NAME="llm_model" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false" COMMENT="Model identifier as configured in the provider."/>
         <FIELD NAME="prompt_hash" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="SHA-256 of the full prompt for deduplication and cache lookups."/>
-        <FIELD NAME="prompt_text" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Full prompt sent to the LLM. v0.2 will encrypt at-rest."/>
+        <FIELD NAME="prompt_text" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Full prompt sent to the LLM, including the student's submission text."/>
         <FIELD NAME="response_json" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Raw response from the LLM (parsed JSON object as string)."/>
         <FIELD NAME="tokens_input" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="tokens_output" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>

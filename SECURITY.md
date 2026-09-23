@@ -96,11 +96,16 @@ only reads the configured provider via the AI Subsystem API. If you
 discover a code path where the plugin reads, logs, persists or emits a
 provider API key, please report it as **Critical**.
 
-The audit log (`local_aigrader_grading_log`) intentionally stores a
-SHA-256 hash of the prompt, not the prompt itself, to balance audit
-needs against student-data minimisation. If the plugin ever persists
-the raw prompt to disk or the database, that's a privacy bug — please
-report it.
+The audit log (`local_aigrader_log`) stores, for every AI call, the
+full prompt sent to the LLM (which includes the student's submission
+text) next to its SHA-256 hash, so that a grading decision can be
+reviewed later. This is declared in the privacy provider. On a GDPR
+deletion request for a student, that student's proposals and audit
+entries (prompt included) are deleted; a teacher's request anonymises
+the teacher in the entries. Course backups include the audit log only
+when user data is included. If you find a path where the prompt or the student's
+text leaves Moodle other than through the AI Subsystem call itself, or
+survives a GDPR deletion, that's a privacy bug — please report it.
 
 ## Privacy issues
 
