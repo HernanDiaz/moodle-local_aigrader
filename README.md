@@ -14,6 +14,10 @@ gradebook without an explicit teacher click.
 
 ![AI Grader Pro in 70 seconds: set the criteria, review the AI proposal, publish, grade code and read the class report](docs/media/aigrader_demo.gif)
 
+**Watch the 2-minute video demo** (English, with Spanish subtitles):
+
+<a href="https://youtu.be/5whb8pkGnfM"><img src="docs/media/aigrader_video.jpg" alt="AI Grader Pro video demo on YouTube" width="480"></a>
+
 ---
 
 ## What it does
