@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/aigrader/db" VERSION="2026092401" COMMENT="DB schema for local_aigrader plugin (AI Grader Pro).">
+<XMLDB PATH="local/aigrader/db" VERSION="2026092500" COMMENT="DB schema for local_aigrader plugin (AI Grader Pro).">
   <TABLES>
 
     <TABLE NAME="local_aigrader_assign" COMMENT="Per-assignment configuration: which assignments have AI Grader Pro enabled, evaluation criteria written by the teacher, and per-assignment overrides for model/language.">
@@ -96,6 +96,30 @@
         <INDEX NAME="timecreated_ix" UNIQUE="false" FIELDS="timecreated"/>
         <INDEX NAME="prompt_hash_ix" UNIQUE="false" FIELDS="prompt_hash"/>
       </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="local_aigrader_report" COMMENT="Class reports: an AI-written summary of how a class did on an assignment, built from the proposals and teacher reviews. Kept so the teacher can reread earlier reports without a new AI call.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="assignid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK to {assign}.id."/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK to {course}.id."/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Teacher who generated the report. 0 after a privacy deletion."/>
+        <FIELD NAME="submissions" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of graded submissions the report is based on."/>
+        <FIELD NAME="stats" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: class statistics at generation time."/>
+        <FIELD NAME="summary" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: the AI-written summary (overview, gaps, strengths, topics, next steps)."/>
+        <FIELD NAME="language" TYPE="char" LENGTH="16" NOTNULL="false" SEQUENCE="false" COMMENT="Language the summary was requested in."/>
+        <FIELD NAME="llmprovider" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="AI Subsystem provider that answered."/>
+        <FIELD NAME="llmmodel" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false" COMMENT="Model configured for that provider, when known."/>
+        <FIELD NAME="tokensin" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="tokensout" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="assignid_fk" TYPE="foreign" FIELDS="assignid" REFTABLE="assign" REFFIELDS="id"/>
+        <KEY NAME="courseid_fk" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+        <KEY NAME="userid_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
     </TABLE>
 
   </TABLES>

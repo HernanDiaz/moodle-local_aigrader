@@ -47,6 +47,9 @@ class restore_local_aigrader_plugin extends restore_local_plugin {
     /** @var stdClass[] Audit log rows waiting for id mappings. */
     private array $pendinglogs = [];
 
+    /** @var stdClass[] Class report rows waiting for the new assignment id. */
+    private array $pendingreports = [];
+
     /**
      * Paths of AI Grader Pro elements inside module.xml.
      *
@@ -62,6 +65,7 @@ class restore_local_aigrader_plugin extends restore_local_plugin {
                 $this->get_pathfor('/aigrader_submissions/aigrader_submission')
             );
             $paths[] = new restore_path_element('aigrader_log', $this->get_pathfor('/aigrader_logs/aigrader_log'));
+            $paths[] = new restore_path_element('aigrader_report', $this->get_pathfor('/aigrader_reports/aigrader_report'));
         }
         return $paths;
     }
@@ -94,6 +98,15 @@ class restore_local_aigrader_plugin extends restore_local_plugin {
     }
 
     /**
+     * Collect one class report row.
+     *
+     * @param array $data Decoded element data.
+     */
+    public function process_aigrader_report($data) {
+        $this->pendingreports[] = (object) $data;
+    }
+
+    /**
      * Write the collected rows, now that the assignment and all mappings exist.
      */
     public function after_restore_module() {
@@ -111,6 +124,28 @@ class restore_local_aigrader_plugin extends restore_local_plugin {
         foreach ($this->pendinglogs as $row) {
             $this->restore_log($row, $courseid);
         }
+        foreach ($this->pendingreports as $row) {
+            $this->restore_report($row, $assignid, $courseid);
+        }
+    }
+
+    /**
+     * Insert one class report, attached to the restored assignment. A teacher
+     * who does not exist on this site is recorded as user 0.
+     *
+     * @param stdClass $row Row as read from the backup.
+     * @param int $assignid Id of the restored assignment.
+     * @param int $courseid Id of the course restored into.
+     */
+    private function restore_report(stdClass $row, int $assignid, int $courseid): void {
+        global $DB;
+
+        $record = clone $row;
+        unset($record->id);
+        $record->assignid = $assignid;
+        $record->courseid = $courseid;
+        $record->userid = (int) ($this->get_mappingid('user', $row->userid) ?: 0);
+        $DB->insert_record('local_aigrader_report', $record);
     }
 
     /**

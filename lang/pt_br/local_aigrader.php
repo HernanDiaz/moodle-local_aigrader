@@ -345,3 +345,38 @@ $string['extract_truncation_warning']        = '{$a->filename} truncado em {$a->
 
 // Confirmação inline ao reavaliar uma linha já publicada.
 $string['confirm_regrade_published'] = 'Este envio já está publicado. Reavaliar com IA? A nota atual no livro de notas não será alterada, mas o estado voltará a "Proposta IA" até que você aprove novamente.';
+
+// Class report (report.php).
+$string['classreport_backtopanel'] = '← Voltar ao AI Grader Pro';
+$string['classreport_erroraicall'] = 'O provedor de IA não conseguiu redigir o relatório: {$a}';
+$string['classreport_errornotenough'] = 'São necessários pelo menos {$a} envios avaliados com o AI Grader Pro para redigir um relatório da turma.';
+$string['classreport_errorsummaryformat'] = 'Não foi possível ler a resposta da IA como um relatório. Tente novamente.';
+$string['classreport_generate'] = 'Gerar relatório';
+$string['classreport_generate_note'] = 'Usa uma chamada à IA. A IA recebe apenas as notas e o feedback, não os envios.';
+$string['classreport_generate_update'] = 'Atualizar relatório';
+$string['classreport_history_heading'] = 'Relatórios anteriores';
+$string['classreport_msg_generated'] = 'Relatório da turma gerado.';
+$string['privacy:metadata:ai_subsystem:report_feedback'] = 'Nota, pontos fortes e pontos a melhorar de cada envio avaliado, numerados, com o nome dos alunos substituído se a configuração "Não enviar o nome do aluno para a IA" do AI Grader Pro estiver ativada.';
+$string['privacy:metadata:report'] = 'Relatórios de turma: um resumo redigido por IA de como a turma se saiu em uma tarefa.';
+$string['privacy:metadata:report:summary'] = 'O resumo, que descreve a turma como um todo, não alunos individuais.';
+$string['privacy:metadata:report:timecreated'] = 'Quando o relatório foi gerado.';
+$string['privacy:metadata:report:userid'] = 'O professor que gerou o relatório.';
+$string['classreport_menu'] = 'Relatório da turma';
+$string['classreport_title'] = 'Relatório da turma: {$a}';
+$string['classreport_stats_count'] = '{$a->count} envios avaliados com o AI Grader Pro, {$a->reviewed} deles revisados pelo professor.';
+$string['classreport_stats_criteria'] = 'Média por critério (do mais fraco ao mais forte)';
+$string['classreport_stats_distribution'] = 'Distribuição das notas';
+$string['classreport_stats_heading'] = 'Estatísticas da turma';
+$string['classreport_stats_mean'] = 'Média';
+$string['classreport_stats_median'] = 'Mediana';
+$string['classreport_stats_none'] = 'Ainda não há envios avaliados com o AI Grader Pro.';
+$string['classreport_stats_range'] = 'Mínima – máxima';
+$string['classreport_summary_disclaimer'] = 'Redigido por IA a partir das notas e do feedback da turma. Revise-o antes de compartilhá-lo.';
+$string['classreport_summary_gap_count'] = 'cerca de {$a} envios';
+$string['classreport_summary_gaps'] = 'Lacunas mais frequentes';
+$string['classreport_summary_generatedinfo'] = 'Gerado em {$a->date} por {$a->user} a partir de {$a->submissions} envios avaliados.';
+$string['classreport_summary_heading'] = 'Resumo executivo';
+$string['classreport_summary_nextsteps'] = 'Próximos passos sugeridos';
+$string['classreport_summary_none'] = 'Ainda não há resumo. Gere um para ver as lacunas mais frequentes da turma e o que reforçar.';
+$string['classreport_summary_strengths'] = 'O que a turma fez bem';
+$string['classreport_summary_topics'] = 'Temas a reforçar em aula';

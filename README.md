@@ -7,7 +7,7 @@ edits if needed, and decides whether to publish. Nothing reaches the
 gradebook without an explicit teacher click.
 
 [![CI](https://github.com/HernanDiaz/moodle-local_aigrader/actions/workflows/moodle-ci.yml/badge.svg)](https://github.com/HernanDiaz/moodle-local_aigrader/actions/workflows/moodle-ci.yml)
-[![Tests](https://img.shields.io/badge/PHPUnit-130%20tests%20passing-brightgreen)](#tests)
+[![Tests](https://img.shields.io/badge/PHPUnit-140%20tests%20passing-brightgreen)](#tests)
 [![Code style](https://img.shields.io/badge/phpcs-0%20errors-brightgreen)](#code-quality)
 [![Languages](https://img.shields.io/badge/i18n-5%20languages-blue)](#features)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
@@ -58,6 +58,11 @@ contains the teacher's `user.id`, never a system id.
   and presentations (`.odt`, `.odp`), Jupyter notebooks (`.ipynb`), PDF
   (text-based, up to 5 MB), ZIP archives (including the office
   documents inside them), and 20+ source-code languages.
+- 📈 **Class report**: per-assignment statistics (average, median,
+  distribution, weakest criteria) and an AI-written executive summary
+  of the class — common gaps and how often they appear, what the class
+  did well, topics to reinforce and next steps. The AI receives only
+  the anonymised grades and feedback, never the submissions.
 - ⚡ **Automatic grading on submission** (per assignment, off by
   default): the proposal is waiting when the teacher opens the panel.
   Proposals the teacher already reviewed or published are never
@@ -102,7 +107,7 @@ contains the teacher's `user.id`, never a system id.
   teacher decisions and audit log.
 - 🛡️ **Privacy provider** implementing GDPR Art. 15 (data export),
   Art. 17 (deletion) and the AI Act Annex III audit trail.
-- ✅ **Tested**: 130 PHPUnit tests + 16 Behat scenarios, on Moodle 4.5,
+- ✅ **Tested**: 140 PHPUnit tests + 18 Behat scenarios, on Moodle 4.5,
   5.0, 5.1 and 5.2 in CI.
 
 ## Requirements
@@ -247,13 +252,13 @@ vendor/bin/phpunit --testsuite local_aigrader_testsuite
 vendor/bin/behat --tags @local_aigrader
 ```
 
-Current status: 130 PHPUnit tests + 16 Behat scenarios, all passing.
+Current status: 140 PHPUnit tests + 18 Behat scenarios, all passing.
 
 For manual end-to-end smoke testing (after an upgrade, or during
-peer review), see [TESTPLAN.md](TESTPLAN.md) — 23 scenarios walking
+peer review), see [TESTPLAN.md](TESTPLAN.md) — 24 scenarios walking
 through install, configure, grade, publish, bulk, filter, error
 paths, privacy export, backup/restore, file formats, automatic
-grading, copying criteria, name removal and uninstall.
+grading, copying criteria, name removal, class report and uninstall.
 
 ## Code quality
 
@@ -271,6 +276,8 @@ strings).
 See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 Highlights:
 
+- **v1.1.0-beta** — Class report: statistics and an AI-written
+  executive summary of how the class did on each assignment.
 - **v1.0.28-beta** — PowerPoint and OpenDocument files (also inside
   ZIPs). Automatic grading when a student submits. Copy criteria from
   another assignment. Student names replaced with `[STUDENT]` before

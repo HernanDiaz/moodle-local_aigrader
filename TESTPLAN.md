@@ -504,6 +504,25 @@ decisions and audit log.
 3. Untick **Keep student names out of the AI** in the site settings and
    repeat. **Expected**: the name is sent as written.
 
+## Scenario 24: Class report
+
+1. On an assignment with 1-2 graded submissions, click **Class report**
+   on the AI Grader Pro page. **Expected**: statistics are shown and a
+   notice says at least 3 graded submissions are needed; no
+   **Generate report** button.
+2. With 3 or more graded submissions (some reviewed), **Expected**:
+   counts, average, median and range on the assignment's scale (e.g.
+   "73.3 / 100"), grade bands and per-criterion averages, weakest first.
+3. Click **Generate report**. **Expected**: after a few seconds, an
+   overview, most common gaps with an approximate count and advice,
+   what the class did well, topics to reinforce and next steps, in the
+   assignment's feedback language, with no student named.
+4. Generate again. **Expected**: the new report is shown and the earlier
+   one is listed under **Earlier reports** and can be opened.
+5. Break the provider (wrong API key, or no network). **Expected**: a
+   readable "The AI provider could not write the report: …" message,
+   nothing stored.
+
 ---
 
 ## What is intentionally **not** in this plan

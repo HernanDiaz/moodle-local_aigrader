@@ -17,10 +17,11 @@
 /**
  * Privacy Subsystem implementation for AI Grader Pro.
  *
- * Declares the personal data this plugin stores across its 3 tables
- * (local_aigrader_assign, local_aigrader_submission, local_aigrader_log)
- * plus the fact that submission text is sent to an external LLM via the
- * Moodle AI Subsystem. Implements export and delete for GDPR.
+ * Declares the personal data this plugin stores across its tables
+ * (local_aigrader_assign, local_aigrader_submission, local_aigrader_log,
+ * local_aigrader_report) plus the fact that submission text is sent to an
+ * external LLM via the Moodle AI Subsystem. Implements export and delete
+ * for GDPR.
  *
  * Deletion policy:
  *   - Student data (rows where this user is the studentid) is fully deleted.
@@ -117,12 +118,24 @@ class provider implements
             'privacy:metadata:log'
         );
 
+        // Local_aigrader_report: class reports (describe a class, not a student).
+        $collection->add_database_table(
+            'local_aigrader_report',
+            [
+                'userid'      => 'privacy:metadata:report:userid',
+                'summary'     => 'privacy:metadata:report:summary',
+                'timecreated' => 'privacy:metadata:report:timecreated',
+            ],
+            'privacy:metadata:report'
+        );
+
         // External LLM provider (via Moodle AI Subsystem).
         $collection->add_external_location_link(
             'ai_subsystem',
             [
-                'prompt_text' => 'privacy:metadata:ai_subsystem:prompt_text',
-                'userid'      => 'privacy:metadata:ai_subsystem:userid',
+                'prompt_text'     => 'privacy:metadata:ai_subsystem:prompt_text',
+                'userid'          => 'privacy:metadata:ai_subsystem:userid',
+                'report_feedback' => 'privacy:metadata:ai_subsystem:report_feedback',
             ],
             'privacy:metadata:ai_subsystem'
         );
@@ -178,6 +191,10 @@ class provider implements
         );
         foreach ($rows as $row) {
             $assignids[(int) $row->assignid] = (int) $row->assignid;
+        }
+
+        foreach ($DB->get_fieldset_select('local_aigrader_report', 'assignid', 'userid = ?', [$userid]) as $aid) {
+            $assignids[(int) $aid] = (int) $aid;
         }
 
         if (empty($assignids)) {
@@ -257,6 +274,14 @@ class provider implements
                FROM {local_aigrader_log} lal
                JOIN {local_aigrader_submission} las ON las.submissionid = lal.submissionid
               WHERE las.assignid = :aid",
+            ['aid' => $assignid]
+        );
+
+        // Class reports: the teacher who generated them.
+        $userlist->add_from_sql(
+            'userid',
+            "SELECT userid FROM {local_aigrader_report}
+              WHERE assignid = :aid AND userid <> 0",
             ['aid' => $assignid]
         );
     }
@@ -373,6 +398,19 @@ class provider implements
                 writer::with_context($context)
                     ->export_data(array_merge($subroot, ['log', (string) $r->id]), $data);
             }
+
+            // 5. Class reports the user generated.
+            $reports = $DB->get_records('local_aigrader_report', ['assignid' => $assignid, 'userid' => $userid], 'id');
+            foreach ($reports as $report) {
+                $data = (object) [
+                    'role'        => 'teacher_who_generated_report',
+                    'submissions' => (int) $report->submissions,
+                    'summary'     => json_decode((string) $report->summary, true),
+                    'timecreated' => transform::datetime($report->timecreated),
+                ];
+                writer::with_context($context)
+                    ->export_data(array_merge($subroot, ['class_reports', (string) $report->id]), $data);
+            }
         }
     }
 
@@ -407,6 +445,8 @@ class provider implements
         $DB->delete_records('local_aigrader_submission', ['assignid' => $assignid]);
         // Delete the assignment config.
         $DB->delete_records('local_aigrader_assign', ['assignid' => $assignid]);
+        // Delete the class reports.
+        $DB->delete_records('local_aigrader_report', ['assignid' => $assignid]);
     }
 
     /**
@@ -506,5 +546,9 @@ class provider implements
               WHERE assignid = ? AND usermodified = ?",
             [$assignid, $userid]
         );
+
+        // 6. Anonymise the teacher of the class reports; they describe the
+        // class, not the teacher, and stay for the other teachers.
+        $DB->set_field('local_aigrader_report', 'userid', 0, ['assignid' => $assignid, 'userid' => $userid]);
     }
 }

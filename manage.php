@@ -237,6 +237,16 @@ if ($totalrows === 0) {
     exit;
 }
 
+// The class report summarises the whole assignment.
+echo html_writer::div(
+    html_writer::link(
+        new moodle_url('/local/aigrader/report.php', ['cmid' => $cmid]),
+        get_string('classreport_menu', 'local_aigrader'),
+        ['class' => 'btn btn-outline-primary']
+    ),
+    'mb-3'
+);
+
 // Auto-refresh while any grading is in flight. With pagination the
 // teacher might not see the pending row on the current page, but we
 // still want to keep the counter chip live — hence: trigger off the

@@ -345,3 +345,38 @@ $string['extract_truncation_warning']        = '{$a->filename} tronqué à {$a->
 
 // Confirmation inline en réévaluant une ligne déjà publiée.
 $string['confirm_regrade_published'] = 'Cette remise est déjà publiée. Réévaluer avec l\'IA ? La note actuelle dans le carnet de notes ne changera pas, mais l\'état reviendra à « Proposition IA » jusqu\'à ce que vous approuviez à nouveau.';
+
+// Class report (report.php).
+$string['classreport_backtopanel'] = '← Retour à AI Grader Pro';
+$string['classreport_erroraicall'] = 'Le fournisseur d\'IA n\'a pas pu rédiger le rapport : {$a}';
+$string['classreport_errornotenough'] = 'Il faut au moins {$a} remises évaluées avec AI Grader Pro pour rédiger un rapport de classe.';
+$string['classreport_errorsummaryformat'] = 'La réponse de l\'IA n\'a pas pu être lue comme un rapport. Veuillez réessayer.';
+$string['classreport_generate'] = 'Générer le rapport';
+$string['classreport_generate_note'] = 'Utilise un appel à l\'IA. L\'IA ne reçoit que les notes et le feedback, pas les remises.';
+$string['classreport_generate_update'] = 'Mettre à jour le rapport';
+$string['classreport_history_heading'] = 'Rapports précédents';
+$string['classreport_msg_generated'] = 'Rapport de classe généré.';
+$string['privacy:metadata:ai_subsystem:report_feedback'] = 'Note, points forts et points à améliorer de chaque remise évaluée, numérotés, avec le nom des étudiants remplacé si le réglage « Ne pas envoyer le nom de l\'étudiant à l\'IA » d\'AI Grader Pro est activé.';
+$string['privacy:metadata:report'] = 'Rapports de classe : un résumé rédigé par IA de la façon dont la classe a réussi un devoir.';
+$string['privacy:metadata:report:summary'] = 'Le résumé, qui décrit la classe dans son ensemble et non des étudiants en particulier.';
+$string['privacy:metadata:report:timecreated'] = 'Date de génération du rapport.';
+$string['privacy:metadata:report:userid'] = 'L\'enseignant qui a généré le rapport.';
+$string['classreport_menu'] = 'Rapport de classe';
+$string['classreport_title'] = 'Rapport de classe : {$a}';
+$string['classreport_stats_count'] = '{$a->count} remises évaluées avec AI Grader Pro, dont {$a->reviewed} relues par l\'enseignant.';
+$string['classreport_stats_criteria'] = 'Moyenne par critère (du plus faible au plus fort)';
+$string['classreport_stats_distribution'] = 'Répartition des notes';
+$string['classreport_stats_heading'] = 'Statistiques de la classe';
+$string['classreport_stats_mean'] = 'Moyenne';
+$string['classreport_stats_median'] = 'Médiane';
+$string['classreport_stats_none'] = 'Aucune remise n\'a encore été évaluée avec AI Grader Pro.';
+$string['classreport_stats_range'] = 'Minimum – maximum';
+$string['classreport_summary_disclaimer'] = 'Rédigé par IA à partir des notes et du feedback de la classe. Relisez-le avant de le partager.';
+$string['classreport_summary_gap_count'] = 'environ {$a} remises';
+$string['classreport_summary_gaps'] = 'Lacunes les plus fréquentes';
+$string['classreport_summary_generatedinfo'] = 'Généré le {$a->date} par {$a->user} à partir de {$a->submissions} remises évaluées.';
+$string['classreport_summary_heading'] = 'Résumé exécutif';
+$string['classreport_summary_nextsteps'] = 'Prochaines étapes suggérées';
+$string['classreport_summary_none'] = 'Pas encore de résumé. Générez-en un pour voir les lacunes les plus fréquentes de la classe et ce qu\'il faut renforcer.';
+$string['classreport_summary_strengths'] = 'Ce que la classe a bien fait';
+$string['classreport_summary_topics'] = 'Notions à renforcer en classe';

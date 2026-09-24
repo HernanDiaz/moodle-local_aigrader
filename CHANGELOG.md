@@ -5,6 +5,39 @@ here. The format follows [Keep a Changelog](https://keepachangelog.com/),
 versions follow Moodle's `YYYYMMDDXX` plugin-version convention with a
 parallel semantic-style release name.
 
+## [v1.1.0-beta] — 2026-09-25
+
+### Added
+
+- **Class report** — a new page per assignment ("Class report", from
+  the AI Grader Pro panel or the assignment's menu) that summarises how
+  the whole class did:
+  - statistics computed locally, without AI: graded submissions and how
+    many the teacher reviewed, average, median and range on the
+    assignment's own scale, grade distribution, and the average per
+    criterion, weakest first;
+  - an executive summary written by the AI in one call: an overview,
+    the most common gaps with roughly how many submissions show each
+    and how to address them, what the class did well, topics to
+    reinforce in class and next steps for the teacher.
+
+  The AI receives only each submission's grade, strengths and areas for
+  improvement, numbered and with the student's name replaced (also when
+  a teacher wrote it in the feedback); never the submissions. The
+  teacher's reviewed version counts where there is one. At least 3
+  graded submissions are needed, so the summary is about a class, not
+  about individuals. Reports are stored, so rereading one costs no AI
+  call; they travel in backups with user data and are covered by the
+  privacy provider (the only personal data is the teacher who generated
+  each report).
+
+### Fixed
+
+- If the AI provider cannot be reached at all (network or TLS error,
+  e.g. a proxy or antivirus inspecting HTTPS), Moodle 4.5's OpenAI
+  provider throws a coding error; the class report now shows a readable
+  message instead.
+
 ## [v1.0.28-beta] — 2026-09-24
 
 ### Added

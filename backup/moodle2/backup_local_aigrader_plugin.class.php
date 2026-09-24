@@ -24,8 +24,9 @@
  *   - always includes the per-assignment configuration
  *     (local_aigrader_assign: criteria, feedback language...);
  *   - when the backup includes user data, also includes the AI proposals and
- *     teacher decisions (local_aigrader_submission) and the audit log
- *     (local_aigrader_log) of that assignment.
+ *     teacher decisions (local_aigrader_submission), the audit log
+ *     (local_aigrader_log) and the class reports (local_aigrader_report) of
+ *     that assignment.
  *
  * v1.0.26 treated the connection point as an object and crashed every
  * activity backup with "Call to a member function get_element() on string";
@@ -135,5 +136,24 @@ class backup_local_aigrader_plugin extends backup_local_plugin {
         );
         $log->annotate_ids('user', 'userid');
         $log->annotate_ids('user', 'studentid');
+
+        // Class reports of the assignment (they name the teacher who generated them).
+        $reports = new backup_nested_element('aigrader_reports');
+        $report = new backup_nested_element('aigrader_report', ['id'], [
+            'userid',
+            'submissions',
+            'stats',
+            'summary',
+            'language',
+            'llmprovider',
+            'llmmodel',
+            'tokensin',
+            'tokensout',
+            'timecreated',
+        ]);
+        $wrapper->add_child($reports);
+        $reports->add_child($report);
+        $report->set_source_table('local_aigrader_report', ['assignid' => backup::VAR_ACTIVITYID]);
+        $report->annotate_ids('user', 'userid');
     }
 }

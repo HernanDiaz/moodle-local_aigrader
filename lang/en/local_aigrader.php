@@ -346,3 +346,38 @@ $string['extract_truncation_warning']        = '{$a->filename} truncated to {$a-
 
 // Inline confirmation when re-grading an already-published row.
 $string['confirm_regrade_published'] = 'This submission is already published. Re-grade with AI? The current gradebook value will stay untouched, but the status will revert to "AI proposal" until you approve again.';
+
+// Class report (report.php).
+$string['classreport_backtopanel'] = '← Back to AI Grader Pro';
+$string['classreport_erroraicall'] = 'The AI provider could not write the report: {$a}';
+$string['classreport_errornotenough'] = 'At least {$a} submissions must be graded with AI Grader Pro before a class report can be written.';
+$string['classreport_errorsummaryformat'] = 'The AI answer could not be read as a report. Please try again.';
+$string['classreport_generate'] = 'Generate report';
+$string['classreport_generate_note'] = 'Uses one AI call. The AI receives only the grades and feedback, not the submissions.';
+$string['classreport_generate_update'] = 'Update report';
+$string['classreport_history_heading'] = 'Earlier reports';
+$string['classreport_msg_generated'] = 'Class report generated.';
+$string['privacy:metadata:ai_subsystem:report_feedback'] = 'Grade, strengths and areas for improvement of each graded submission, numbered, with the students\' names replaced when AI Grader Pro\'s "Keep student names out of the AI" setting is on.';
+$string['privacy:metadata:report'] = 'Class reports: an AI-written summary of how a class did on an assignment.';
+$string['privacy:metadata:report:summary'] = 'The summary, which describes the class as a whole, not individual students.';
+$string['privacy:metadata:report:timecreated'] = 'When the report was generated.';
+$string['privacy:metadata:report:userid'] = 'The teacher who generated the report.';
+$string['classreport_menu'] = 'Class report';
+$string['classreport_title'] = 'Class report: {$a}';
+$string['classreport_stats_count'] = '{$a->count} submissions graded with AI Grader Pro, {$a->reviewed} of them reviewed by the teacher.';
+$string['classreport_stats_criteria'] = 'Average per criterion (weakest first)';
+$string['classreport_stats_distribution'] = 'Grade distribution';
+$string['classreport_stats_heading'] = 'Class statistics';
+$string['classreport_stats_mean'] = 'Average';
+$string['classreport_stats_median'] = 'Median';
+$string['classreport_stats_none'] = 'No submission has been graded with AI Grader Pro yet.';
+$string['classreport_stats_range'] = 'Lowest – highest';
+$string['classreport_summary_disclaimer'] = 'Written by AI from the grades and feedback of the class. Review it before sharing it.';
+$string['classreport_summary_gap_count'] = 'about {$a} submissions';
+$string['classreport_summary_gaps'] = 'Most common gaps';
+$string['classreport_summary_generatedinfo'] = 'Generated on {$a->date} by {$a->user} from {$a->submissions} graded submissions.';
+$string['classreport_summary_heading'] = 'Executive summary';
+$string['classreport_summary_nextsteps'] = 'Suggested next steps';
+$string['classreport_summary_none'] = 'No summary yet. Generate one to see the class\'s most common gaps and what to reinforce.';
+$string['classreport_summary_strengths'] = 'What the class did well';
+$string['classreport_summary_topics'] = 'Topics to reinforce in class';

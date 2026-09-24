@@ -62,5 +62,13 @@ function xmldb_local_aigrader_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2026092401, 'local', 'aigrader');
     }
 
+    // v1.1.0 — class reports.
+    if ($oldversion < 2026092500) {
+        if (!$dbman->table_exists('local_aigrader_report')) {
+            $dbman->install_one_table_from_xmldb_file(__DIR__ . '/install.xml', 'local_aigrader_report');
+        }
+        upgrade_plugin_savepoint(true, 2026092500, 'local', 'aigrader');
+    }
+
     return true;
 }

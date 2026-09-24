@@ -345,3 +345,38 @@ $string['extract_truncation_warning']        = '{$a->filename} truncat a {$a->ch
 
 // Confirmació inline en tornar a qualificar una fila ja publicada.
 $string['confirm_regrade_published'] = 'Aquest lliurament ja està publicat. Tornar a qualificar amb IA? La nota actual al quadern de qualificacions no canviarà, però l\'estat tornarà a «Proposta IA» fins que tornis a aprovar.';
+
+// Class report (report.php).
+$string['classreport_backtopanel'] = '← Torna a AI Grader Pro';
+$string['classreport_erroraicall'] = 'El proveïdor d\'IA no ha pogut redactar l\'informe: {$a}';
+$string['classreport_errornotenough'] = 'Calen almenys {$a} lliuraments qualificats amb AI Grader Pro per redactar un informe de classe.';
+$string['classreport_errorsummaryformat'] = 'No s\'ha pogut llegir la resposta de la IA com un informe. Torna-ho a provar.';
+$string['classreport_generate'] = 'Genera l\'informe';
+$string['classreport_generate_note'] = 'Fa servir una crida a la IA. La IA rep només les notes i el feedback, no els lliuraments.';
+$string['classreport_generate_update'] = 'Actualitza l\'informe';
+$string['classreport_history_heading'] = 'Informes anteriors';
+$string['classreport_msg_generated'] = 'S\'ha generat l\'informe de classe.';
+$string['privacy:metadata:ai_subsystem:report_feedback'] = 'Nota, encerts i aspectes a millorar de cada lliurament qualificat, numerats, amb el nom dels alumnes substituït si està activat el paràmetre "No enviar el nom de l\'alumne a la IA" d\'AI Grader Pro.';
+$string['privacy:metadata:report'] = 'Informes de classe: un resum redactat per IA de com li ha anat a la classe en una tasca.';
+$string['privacy:metadata:report:summary'] = 'El resum, que descriu la classe en conjunt, no alumnes concrets.';
+$string['privacy:metadata:report:timecreated'] = 'Quan es va generar l\'informe.';
+$string['privacy:metadata:report:userid'] = 'El professor que va generar l\'informe.';
+$string['classreport_menu'] = 'Informe de classe';
+$string['classreport_title'] = 'Informe de classe: {$a}';
+$string['classreport_stats_count'] = '{$a->count} lliuraments qualificats amb AI Grader Pro, {$a->reviewed} d\'ells revisats pel professor.';
+$string['classreport_stats_criteria'] = 'Mitjana per criteri (del més feble al més fort)';
+$string['classreport_stats_distribution'] = 'Distribució de notes';
+$string['classreport_stats_heading'] = 'Estadístiques de la classe';
+$string['classreport_stats_mean'] = 'Mitjana';
+$string['classreport_stats_median'] = 'Mediana';
+$string['classreport_stats_none'] = 'Encara no hi ha lliuraments qualificats amb AI Grader Pro.';
+$string['classreport_stats_range'] = 'Mínima – màxima';
+$string['classreport_summary_disclaimer'] = 'Redactat per IA a partir de les notes i el feedback de la classe. Revisa\'l abans de compartir-lo.';
+$string['classreport_summary_gap_count'] = 'uns {$a} lliuraments';
+$string['classreport_summary_gaps'] = 'Mancances més freqüents';
+$string['classreport_summary_generatedinfo'] = 'Generat el {$a->date} per {$a->user} a partir de {$a->submissions} lliuraments qualificats.';
+$string['classreport_summary_heading'] = 'Resum executiu';
+$string['classreport_summary_nextsteps'] = 'Propers passos suggerits';
+$string['classreport_summary_none'] = 'Encara no hi ha resum. Genera\'n un per veure les mancances més freqüents de la classe i què cal reforçar.';
+$string['classreport_summary_strengths'] = 'El que la classe ha fet bé';
+$string['classreport_summary_topics'] = 'Temes a reforçar a classe';

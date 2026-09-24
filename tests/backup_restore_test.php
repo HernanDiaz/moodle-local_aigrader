@@ -107,6 +107,10 @@ final class backup_restore_test extends \advanced_testcase {
         $plugingenerator->enable_for_assignment($assign);
         $plugingenerator->create_submission_proposal($submission, ['status' => 'teacher_reviewed']);
         $plugingenerator->create_log_entry($submission, ['action' => 'grade']);
+        $DB->insert_record('local_aigrader_report', (object) [
+            'assignid' => $assign->id, 'courseid' => $course->id, 'userid' => get_admin()->id, 'submissions' => 1,
+            'stats' => '{}', 'summary' => json_encode(['overview' => 'REPORT-MARKER']), 'timecreated' => time(),
+        ]);
 
         $newcourseid = $this->backup_and_restore_course($course);
 
@@ -131,6 +135,11 @@ final class backup_restore_test extends \advanced_testcase {
         $this->assertNotFalse($log, 'The audit log entry was not restored.');
         $this->assertEquals($newcourseid, $log->courseid);
         $this->assertSame('grade', $log->action);
+
+        $report = $DB->get_record('local_aigrader_report', ['assignid' => $newassign->id]);
+        $this->assertNotFalse($report, 'The class report was not restored.');
+        $this->assertEquals($newcourseid, $report->courseid);
+        $this->assertStringContainsString('REPORT-MARKER', $report->summary);
     }
 
     /**

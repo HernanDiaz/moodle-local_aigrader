@@ -121,4 +121,13 @@ function local_aigrader_extend_settings_navigation(\settings_navigation $setting
         new \pix_icon('i/scales', '')
     );
     $modulenode->add_node($node);
+
+    $modulenode->add_node(\navigation_node::create(
+        get_string('classreport_menu', 'local_aigrader'),
+        new \moodle_url('/local/aigrader/report.php', ['cmid' => $cm->id]),
+        \navigation_node::TYPE_SETTING,
+        null,
+        'local_aigrader_classreport',
+        new \pix_icon('i/report', '')
+    ));
 }

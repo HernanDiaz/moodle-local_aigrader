@@ -165,12 +165,13 @@ final class provider_test extends \advanced_testcase {
         $result     = provider::get_metadata($collection);
         $items      = $result->get_collection();
 
-        $this->assertCount(4, $items, 'Expected 3 tables + 1 external location');
+        $this->assertCount(5, $items, 'Expected 4 tables + 1 external location');
 
         $names = array_map(static fn($i) => $i->get_name(), $items);
         $this->assertContains('local_aigrader_assign', $names);
         $this->assertContains('local_aigrader_submission', $names);
         $this->assertContains('local_aigrader_log', $names);
+        $this->assertContains('local_aigrader_report', $names);
         $this->assertContains('ai_subsystem', $names);
     }
 

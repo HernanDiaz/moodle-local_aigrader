@@ -350,3 +350,38 @@ $string['extract_truncation_warning']        = '{$a->filename} truncado a {$a->c
 
 // Confirmación inline al re-calificar una fila ya publicada.
 $string['confirm_regrade_published'] = 'Esta entrega ya está publicada. ¿Recalificar con IA? La nota actual del cuaderno de calificaciones no cambiará, pero el estado volverá a «Propuesta IA» hasta que vuelvas a aprobar.';
+
+// Class report (report.php).
+$string['classreport_backtopanel'] = '← Volver a AI Grader Pro';
+$string['classreport_erroraicall'] = 'El proveedor de IA no pudo redactar el informe: {$a}';
+$string['classreport_errornotenough'] = 'Hacen falta al menos {$a} entregas calificadas con AI Grader Pro para redactar un informe de clase.';
+$string['classreport_errorsummaryformat'] = 'No se pudo leer la respuesta de la IA como un informe. Vuelve a intentarlo.';
+$string['classreport_generate'] = 'Generar informe';
+$string['classreport_generate_note'] = 'Usa una llamada a la IA. La IA recibe solo las notas y el feedback, no las entregas.';
+$string['classreport_generate_update'] = 'Actualizar informe';
+$string['classreport_history_heading'] = 'Informes anteriores';
+$string['classreport_msg_generated'] = 'Informe de clase generado.';
+$string['privacy:metadata:ai_subsystem:report_feedback'] = 'Nota, aciertos y aspectos a mejorar de cada entrega calificada, numerados, con el nombre de los alumnos sustituido si está activado el ajuste "No enviar el nombre del alumno a la IA" de AI Grader Pro.';
+$string['privacy:metadata:report'] = 'Informes de clase: un resumen redactado por IA de cómo le fue a la clase en una tarea.';
+$string['privacy:metadata:report:summary'] = 'El resumen, que describe a la clase en conjunto, no a alumnos concretos.';
+$string['privacy:metadata:report:timecreated'] = 'Cuándo se generó el informe.';
+$string['privacy:metadata:report:userid'] = 'El profesor que generó el informe.';
+$string['classreport_menu'] = 'Informe de clase';
+$string['classreport_title'] = 'Informe de clase: {$a}';
+$string['classreport_stats_count'] = '{$a->count} entregas calificadas con AI Grader Pro, {$a->reviewed} de ellas revisadas por el profesor.';
+$string['classreport_stats_criteria'] = 'Media por criterio (de más débil a más fuerte)';
+$string['classreport_stats_distribution'] = 'Distribución de notas';
+$string['classreport_stats_heading'] = 'Estadísticas de la clase';
+$string['classreport_stats_mean'] = 'Media';
+$string['classreport_stats_median'] = 'Mediana';
+$string['classreport_stats_none'] = 'Todavía no hay entregas calificadas con AI Grader Pro.';
+$string['classreport_stats_range'] = 'Mínima – máxima';
+$string['classreport_summary_disclaimer'] = 'Redactado por IA a partir de las notas y el feedback de la clase. Revísalo antes de compartirlo.';
+$string['classreport_summary_gap_count'] = 'unas {$a} entregas';
+$string['classreport_summary_gaps'] = 'Carencias más frecuentes';
+$string['classreport_summary_generatedinfo'] = 'Generado el {$a->date} por {$a->user} a partir de {$a->submissions} entregas calificadas.';
+$string['classreport_summary_heading'] = 'Resumen ejecutivo';
+$string['classreport_summary_nextsteps'] = 'Próximos pasos sugeridos';
+$string['classreport_summary_none'] = 'Todavía no hay resumen. Genera uno para ver las carencias más frecuentes de la clase y qué reforzar.';
+$string['classreport_summary_strengths'] = 'Lo que la clase hizo bien';
+$string['classreport_summary_topics'] = 'Temas a reforzar en clase';

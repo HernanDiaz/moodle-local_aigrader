@@ -1,0 +1,156 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_aigrader/class_report
+
+    Class report of an assignment: statistics and the AI-written summary.
+
+    Example context (json):
+    {
+        "count": 12, "reviewed": 4, "hasgrades": true,
+        "mean": "72 / 100", "median": "75 / 100", "min": "40 / 100", "max": "95 / 100",
+        "bands": [{"label": "0–20", "count": 0, "percent": 0}, {"label": "80–100", "count": 5, "percent": 42}],
+        "hascriteria": true,
+        "criteria": [{"name": "Thesis clarity", "average": "5.8", "percent": 58, "count": 12}],
+        "notenough": false, "minsubmissions": 3,
+        "canGenerate": true, "generateurl": "https://example.com/local/aigrader/report.php",
+        "sesskey": "abc", "cmid": 5, "generatelabel": "Generate report",
+        "hasreport": true,
+        "report": {
+            "overview": "Most of the class understood the task.",
+            "hasgaps": true,
+            "gaps": [{"gap": "Weak evidence", "hassubmissions": true, "submissions": 7, "advice": "Show how to cite."}],
+            "hasstrengths": true, "strengths": ["Clear structure"],
+            "hastopics": true, "topics": ["Citing sources"],
+            "hasnextsteps": true, "nextsteps": ["Run a short citation workshop"],
+            "generatedinfo": "Generated on 24 September 2026 by Teacher One from 12 submissions."
+        },
+        "hashistory": true,
+        "history": [{"url": "https://example.com", "label": "24 September 2026, 10:00", "current": true}]
+    }
+}}
+<div class="local-aigrader-classreport">
+    <section class="mb-4">
+        <h3>{{#str}} classreport_stats_heading, local_aigrader {{/str}}</h3>
+        {{#hasgrades}}
+            <p>{{#str}} classreport_stats_count, local_aigrader, { "count": {{count}}, "reviewed": {{reviewed}} } {{/str}}</p>
+            <dl class="row">
+                <dt class="col-sm-3">{{#str}} classreport_stats_mean, local_aigrader {{/str}}</dt><dd class="col-sm-9">{{mean}}</dd>
+                <dt class="col-sm-3">{{#str}} classreport_stats_median, local_aigrader {{/str}}</dt><dd class="col-sm-9">{{median}}</dd>
+                <dt class="col-sm-3">{{#str}} classreport_stats_range, local_aigrader {{/str}}</dt><dd class="col-sm-9">{{min}} – {{max}}</dd>
+            </dl>
+            <h4 class="h5">{{#str}} classreport_stats_distribution, local_aigrader {{/str}}</h4>
+            <table class="table table-sm w-auto">
+                <tbody>
+                {{#bands}}
+                    <tr>
+                        <th scope="row" class="text-nowrap pr-3 pe-3">{{label}}</th>
+                        <td style="min-width: 12rem;">
+                            <div class="progress" style="height: 1rem;">
+                                <div class="progress-bar" role="progressbar" style="width: {{percent}}%;" aria-valuenow="{{percent}}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </td>
+                        <td class="text-right text-end">{{count}}</td>
+                    </tr>
+                {{/bands}}
+                </tbody>
+            </table>
+            {{#hascriteria}}
+                <h4 class="h5">{{#str}} classreport_stats_criteria, local_aigrader {{/str}}</h4>
+                <table class="table table-sm w-auto">
+                    <tbody>
+                    {{#criteria}}
+                        <tr>
+                            <th scope="row" class="pr-3 pe-3">{{name}}</th>
+                            <td style="min-width: 12rem;">
+                                <div class="progress" style="height: 1rem;">
+                                    <div class="progress-bar bg-info" role="progressbar" style="width: {{percent}}%;" aria-valuenow="{{percent}}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </td>
+                            <td class="text-nowrap">{{average}} / 10</td>
+                        </tr>
+                    {{/criteria}}
+                    </tbody>
+                </table>
+            {{/hascriteria}}
+        {{/hasgrades}}
+        {{^hasgrades}}
+            <p>{{#str}} classreport_stats_none, local_aigrader {{/str}}</p>
+        {{/hasgrades}}
+    </section>
+
+    <section class="mb-4">
+        <h3>{{#str}} classreport_summary_heading, local_aigrader {{/str}}</h3>
+        {{#notenough}}
+            <div class="alert alert-info">{{#str}} classreport_errornotenough, local_aigrader, {{minsubmissions}} {{/str}}</div>
+        {{/notenough}}
+        {{#canGenerate}}
+            <form method="post" action="{{generateurl}}" class="mb-3">
+                <input type="hidden" name="cmid" value="{{cmid}}">
+                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                <input type="hidden" name="action" value="generate">
+                <button type="submit" class="btn btn-primary">{{generatelabel}}</button>
+                <span class="text-muted ml-2 ms-2">{{#str}} classreport_generate_note, local_aigrader {{/str}}</span>
+            </form>
+        {{/canGenerate}}
+        {{#hasreport}}
+            {{#report}}
+                <div class="alert alert-secondary small">{{#str}} classreport_summary_disclaimer, local_aigrader {{/str}}</div>
+                <p class="lead">{{overview}}</p>
+                {{#hasgaps}}
+                    <h4 class="h5">{{#str}} classreport_summary_gaps, local_aigrader {{/str}}</h4>
+                    <ol>
+                    {{#gaps}}
+                        <li>
+                            <strong>{{gap}}</strong>
+                            {{#hassubmissions}}<span class="badge badge-warning bg-warning text-dark">{{#str}} classreport_summary_gap_count, local_aigrader, {{submissions}} {{/str}}</span>{{/hassubmissions}}
+                            {{#advice}}<div>{{.}}</div>{{/advice}}
+                        </li>
+                    {{/gaps}}
+                    </ol>
+                {{/hasgaps}}
+                {{#hasstrengths}}
+                    <h4 class="h5">{{#str}} classreport_summary_strengths, local_aigrader {{/str}}</h4>
+                    <ul>{{#strengths}}<li>{{.}}</li>{{/strengths}}</ul>
+                {{/hasstrengths}}
+                {{#hastopics}}
+                    <h4 class="h5">{{#str}} classreport_summary_topics, local_aigrader {{/str}}</h4>
+                    <ul>{{#topics}}<li>{{.}}</li>{{/topics}}</ul>
+                {{/hastopics}}
+                {{#hasnextsteps}}
+                    <h4 class="h5">{{#str}} classreport_summary_nextsteps, local_aigrader {{/str}}</h4>
+                    <ul>{{#nextsteps}}<li>{{.}}</li>{{/nextsteps}}</ul>
+                {{/hasnextsteps}}
+                <p class="text-muted small">{{generatedinfo}}</p>
+            {{/report}}
+        {{/hasreport}}
+        {{^hasreport}}
+            {{^notenough}}<p>{{#str}} classreport_summary_none, local_aigrader {{/str}}</p>{{/notenough}}
+        {{/hasreport}}
+    </section>
+
+    {{#hashistory}}
+        <section class="mb-4">
+            <h3 class="h5">{{#str}} classreport_history_heading, local_aigrader {{/str}}</h3>
+            <ul>
+            {{#history}}
+                <li>{{#current}}<strong>{{label}}</strong>{{/current}}{{^current}}<a href="{{url}}">{{label}}</a>{{/current}}</li>
+            {{/history}}
+            </ul>
+        </section>
+    {{/hashistory}}
+</div>

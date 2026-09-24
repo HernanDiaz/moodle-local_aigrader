@@ -175,7 +175,7 @@ EOT;
      * @param \stdClass $assign Assignment row (assign).
      * @return string ISO language code (e.g. 'es', 'en').
      */
-    private static function resolve_language(\stdClass $config, \stdClass $assign): string {
+    public static function resolve_language(\stdClass $config, \stdClass $assign): string {
         if (!empty($config->language_override)) {
             return $config->language_override;
         }
