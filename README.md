@@ -12,6 +12,8 @@ gradebook without an explicit teacher click.
 [![Languages](https://img.shields.io/badge/i18n-5%20languages-blue)](#features)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
 
+![AI Grader Pro in 70 seconds: set the criteria, review the AI proposal, publish, grade code and read the class report](docs/media/aigrader_demo.gif)
+
 ---
 
 ## What it does
