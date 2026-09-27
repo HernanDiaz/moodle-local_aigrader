@@ -5,6 +5,28 @@ here. The format follows [Keep a Changelog](https://keepachangelog.com/),
 versions follow Moodle's `YYYYMMDDXX` plugin-version convention with a
 parallel semantic-style release name.
 
+## [v1.1.1-beta] — 2026-09-28
+
+### Fixed
+
+- **Criterion names now follow the teacher's criteria.** The grading
+  prompt's example asked for keys like "thesis_clarity" for "Claridad
+  de la tesis", so with criteria written in Spanish (or any language
+  other than English) the AI translated the criterion names: teachers
+  saw "Thesis clarity" in the review page. It also named them
+  differently from one submission to the next ("structure_coherence",
+  "structure_and_coherence"), so the class report split one criterion
+  into several averages. Now the AI keeps the teacher's own words and
+  language ("claridad_de_la_tesis" → "Claridad de la tesis"), and once
+  an assignment has a proposal made with its current criteria, every
+  later prompt asks for exactly the same keys. Proposals made before the
+  criteria were last saved, and failed regrades (which keep an older
+  proposal), do not set the keys.
+- Missing accents in 61 older Spanish strings (panel, review page, error
+  banners, privacy metadata): "configuración", "línea", "Acción", etc.
+  The helper text under the strengths and improvements fields on the
+  review page was among them.
+
 ## [v1.1.0-beta] — 2026-09-25
 
 ### Added

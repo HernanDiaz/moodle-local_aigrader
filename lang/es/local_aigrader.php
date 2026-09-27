@@ -98,24 +98,24 @@ $string['errortaskfailed'] = 'La tarea de calificación de AI Grader Pro ha fall
 // Pagina de gestion (/local/aigrader/manage.php).
 $string['manage_pagetitle']         = 'AI Grader Pro · {$a}';
 $string['manage_heading']           = 'AI Grader Pro: {$a}';
-$string['manage_disabled']          = 'AI Grader Pro no esta habilitado en esta tarea. Edita la configuracion de la tarea para activarlo.';
-$string['manage_no_submissions']    = 'Aun no hay entregas para esta tarea.';
-$string['manage_polling']           = 'Una calificacion esta en proceso. Esta pagina se actualizara automaticamente.';
+$string['manage_disabled']          = 'AI Grader Pro no está habilitado en esta tarea. Edita la configuración de la tarea para activarlo.';
+$string['manage_no_submissions']    = 'Aún no hay entregas para esta tarea.';
+$string['manage_polling']           = 'Una calificación está en proceso. Esta página se actualizará automáticamente.';
 $string['manage_back_to_assignment'] = '← Volver a la tarea';
-$string['msg_enqueued']             = 'Tarea de calificacion IA encolada. Se ejecutara en el proximo cron.';
-$string['msg_graded_now']           = 'Calificacion IA completada. Pulsa Revisar → para ver la propuesta.';
-$string['msg_needs_manual_review']  = 'La IA no pudo procesar esta entrega automaticamente. Pulsa Revisar → para calificar a mano.';
+$string['msg_enqueued']             = 'Tarea de calificación IA encolada. Se ejecutará en el próximo cron.';
+$string['msg_graded_now']           = 'Calificación IA completada. Pulsa Revisar → para ver la propuesta.';
+$string['msg_needs_manual_review']  = 'La IA no pudo procesar esta entrega automáticamente. Pulsa Revisar → para calificar a mano.';
 
 $string['th_student']   = 'Alumno';
 $string['th_submitted'] = 'Entregado';
 $string['th_status']    = 'Estado IA';
 $string['th_grade']     = 'Nota propuesta';
-$string['th_action']    = 'Accion';
+$string['th_action']    = 'Acción';
 
 $string['btn_grade_with_ai']   = 'Calificar con IA';
 $string['btn_pending']         = 'Procesando...';
 
-$string['status_none']        = 'Sin calificacion IA';
+$string['status_none']        = 'Sin calificación IA';
 $string['status_pending']     = 'Pendiente';
 $string['status_proposed']    = 'Propuesta IA';
 $string['status_reviewed']    = 'Revisada por profesor';
@@ -123,9 +123,9 @@ $string['status_published']   = 'Publicada';
 $string['status_error']       = 'Error';
 $string['status_unsupported'] = 'Formato no soportado';
 
-$string['errornotenabled']  = 'AI Grader Pro no esta habilitado en esta tarea.';
+$string['errornotenabled']  = 'AI Grader Pro no está habilitado en esta tarea.';
 $string['errornotavailable'] = 'AI Grader Pro no está disponible en este curso. Consulta con la administración del sitio.';
-$string['errornocriteria']  = 'No hay criterios de evaluacion definidos para esta tarea.';
+$string['errornocriteria']  = 'No hay criterios de evaluación definidos para esta tarea.';
 
 // Pagina de revision (/local/aigrader/review.php).
 $string['review_pagetitle']       = 'Revisar propuesta IA · {$a}';
@@ -150,9 +150,9 @@ $string['review_advanced_grading']  = 'Esta tarea usa calificación avanzada ({$
 $string['review_open_grader']       = 'Abrir el calificador de Moodle para este alumno';
 $string['review_grade_none']        = 'Esta tarea está configurada sin calificación: solo se publicará el feedback al alumno.';
 $string['field_strengths']          = 'Aciertos';
-$string['field_strengths_hint']     = 'Uno por linea. Se mostrara al alumno como feedback positivo.';
+$string['field_strengths_hint']     = 'Uno por línea. Se mostrará al alumno como feedback positivo.';
 $string['field_improvements']       = 'Mejorables';
-$string['field_improvements_hint']  = 'Uno por linea. Sugerencias constructivas que vera el alumno.';
+$string['field_improvements_hint']  = 'Uno por línea. Sugerencias constructivas que verá el alumno.';
 $string['field_justification']      = 'Justificación (visible para el alumno)';
 
 $string['btn_review']          = 'Revisar';
@@ -173,93 +173,93 @@ $string['errorgradeoutofrange'] = 'La nota debe estar entre {$a->min} y {$a->max
 $string['erroradvancedgrading'] = 'Esta tarea usa calificación avanzada (rúbrica o guía de evaluación), así que la nota no se puede publicar desde AI Grader Pro. Califícala en el calificador de Moodle.';
 
 // Strings del Privacy provider (reemplazan el placeholder de v0.1.0).
-$string['privacy:metadata'] = 'AI Grader Pro almacena propuestas de calificacion generadas por IA, registros de auditoria de cada accion, y configuracion por tarea. Tambien se envian datos personales a un proveedor LLM externo via el AI Subsystem de Moodle.';
+$string['privacy:metadata'] = 'AI Grader Pro almacena propuestas de calificación generadas por IA, registros de auditoría de cada acción, y configuración por tarea. También se envían datos personales a un proveedor LLM externo vía el AI Subsystem de Moodle.';
 
 // Tabla local_aigrader_assign.
-$string['privacy:metadata:assign']               = 'Configuracion de AI Grader Pro por tarea (en que tareas esta habilitado, criterios de evaluacion, y overrides). Almacena el id del profesor que edito por ultima vez la configuracion.';
+$string['privacy:metadata:assign']               = 'Configuración de AI Grader Pro por tarea (en qué tareas está habilitado, criterios de evaluación, y overrides). Almacena el id del profesor que editó por última vez la configuración.';
 $string['privacy:metadata:assign:assignid']      = 'Id interno de la tarea.';
-$string['privacy:metadata:assign:criteria_text'] = 'Criterios de evaluacion escritos por el profesor en lenguaje natural.';
-$string['privacy:metadata:assign:usermodified']  = 'Id del profesor que edito por ultima vez la configuracion. Se anonimiza al borrar el usuario.';
-$string['privacy:metadata:assign:timecreated']   = 'Momento en que se guardo la configuracion por primera vez.';
-$string['privacy:metadata:assign:timemodified']  = 'Momento de la ultima modificacion.';
+$string['privacy:metadata:assign:criteria_text'] = 'Criterios de evaluación escritos por el profesor en lenguaje natural.';
+$string['privacy:metadata:assign:usermodified']  = 'Id del profesor que editó por última vez la configuración. Se anonimiza al borrar el usuario.';
+$string['privacy:metadata:assign:timecreated']   = 'Momento en que se guardó la configuración por primera vez.';
+$string['privacy:metadata:assign:timemodified']  = 'Momento de la última modificación.';
 
 // Tabla local_aigrader_submission.
-$string['privacy:metadata:submission']                   = 'Estado de la calificacion IA por entrega: nota y feedback propuestos, mas la nota y feedback finales aprobados por el profesor.';
+$string['privacy:metadata:submission']                   = 'Estado de la calificación IA por entrega: nota y feedback propuestos, más la nota y feedback finales aprobados por el profesor.';
 $string['privacy:metadata:submission:submissionid']      = 'Id de la entrega de tarea a la que se refiere.';
 $string['privacy:metadata:submission:studentid']         = 'Id del alumno cuya entrega ha sido calificada.';
-$string['privacy:metadata:submission:status']            = 'Estado actual en la maquina de estados (pending_ai / ai_proposed / teacher_reviewed / published / error).';
+$string['privacy:metadata:submission:status']            = 'Estado actual en la máquina de estados (pending_ai / ai_proposed / teacher_reviewed / published / error).';
 $string['privacy:metadata:submission:proposed_grade']    = 'Nota propuesta por la IA (0-10).';
-$string['privacy:metadata:submission:proposed_feedback'] = 'Respuesta completa del LLM: puntuaciones por criterio, aciertos, mejorables, justificacion.';
-$string['privacy:metadata:submission:final_grade']       = 'Nota aprobada por el profesor (puede diferir de la propuesta si el profesor edito).';
+$string['privacy:metadata:submission:proposed_feedback'] = 'Respuesta completa del LLM: puntuaciones por criterio, aciertos, mejorables, justificación.';
+$string['privacy:metadata:submission:final_grade']       = 'Nota aprobada por el profesor (puede diferir de la propuesta si el profesor editó).';
 $string['privacy:metadata:submission:final_feedback']    = 'Feedback aprobado por el profesor y mostrado al alumno.';
-$string['privacy:metadata:submission:final_grader']      = 'Id del profesor que aprobo la nota. Se anonimiza al borrar el usuario.';
-$string['privacy:metadata:submission:timecreated']       = 'Momento en que se encolo la primera calificacion IA.';
-$string['privacy:metadata:submission:timemodified']      = 'Momento de la ultima modificacion.';
-$string['privacy:metadata:submission:timeprocessed']     = 'Momento en que termino la llamada al LLM.';
-$string['privacy:metadata:submission:timepublished']     = 'Momento en que el profesor aprobo y la nota se escribio en el gradebook.';
+$string['privacy:metadata:submission:final_grader']      = 'Id del profesor que aprobó la nota. Se anonimiza al borrar el usuario.';
+$string['privacy:metadata:submission:timecreated']       = 'Momento en que se encoló la primera calificación IA.';
+$string['privacy:metadata:submission:timemodified']      = 'Momento de la última modificación.';
+$string['privacy:metadata:submission:timeprocessed']     = 'Momento en que terminó la llamada al LLM.';
+$string['privacy:metadata:submission:timepublished']     = 'Momento en que el profesor aprobó y la nota se escribió en el gradebook.';
 
 // Tabla local_aigrader_log.
-$string['privacy:metadata:log']                = 'Registro append-only de cada accion de calificacion IA. Exigido por el AI Act (Reg. 2024/1689 Anexo III) para sistemas IA de alto riesgo en educacion.';
-$string['privacy:metadata:log:userid']         = 'Id del profesor que disparo la accion. Se anonimiza al borrar el usuario.';
-$string['privacy:metadata:log:studentid']      = 'Id del alumno cuya entrega se proceso.';
-$string['privacy:metadata:log:action']         = 'Tipo de accion registrada (grade, regrade, edit, approve, reject).';
+$string['privacy:metadata:log']                = 'Registro append-only de cada acción de calificación IA. Exigido por el AI Act (Reg. 2024/1689 Anexo III) para sistemas IA de alto riesgo en educación.';
+$string['privacy:metadata:log:userid']         = 'Id del profesor que disparó la acción. Se anonimiza al borrar el usuario.';
+$string['privacy:metadata:log:studentid']      = 'Id del alumno cuya entrega se procesó.';
+$string['privacy:metadata:log:action']         = 'Tipo de acción registrada (grade, regrade, edit, approve, reject).';
 $string['privacy:metadata:log:llm_provider']   = 'Nombre del proveedor LLM utilizado (ej. openai, azureai).';
 $string['privacy:metadata:log:llm_model']      = 'Identificador del modelo LLM utilizado (ej. llama-3.3-70b-versatile).';
 $string['privacy:metadata:log:prompt_text']    = 'Prompt completo enviado al LLM (incluye el texto de la entrega del alumno).';
 $string['privacy:metadata:log:response_json']  = 'Respuesta cruda del LLM en JSON (incluye nota propuesta y feedback).';
-$string['privacy:metadata:log:tokens_input']   = 'Numero de tokens de entrada consumidos por la llamada al LLM.';
-$string['privacy:metadata:log:tokens_output']  = 'Numero de tokens de salida consumidos por la llamada al LLM.';
-$string['privacy:metadata:log:proposed_grade'] = 'Nota propuesta por el LLM en el momento de la accion.';
-$string['privacy:metadata:log:final_grade']    = 'Nota final tras revision del profesor (si aplica).';
-$string['privacy:metadata:log:teacher_edits']  = 'JSON diff que muestra como el profesor modifico la propuesta IA.';
-$string['privacy:metadata:log:timecreated']    = 'Momento en que se registro la accion.';
+$string['privacy:metadata:log:tokens_input']   = 'Número de tokens de entrada consumidos por la llamada al LLM.';
+$string['privacy:metadata:log:tokens_output']  = 'Número de tokens de salida consumidos por la llamada al LLM.';
+$string['privacy:metadata:log:proposed_grade'] = 'Nota propuesta por el LLM en el momento de la acción.';
+$string['privacy:metadata:log:final_grade']    = 'Nota final tras revisión del profesor (si aplica).';
+$string['privacy:metadata:log:teacher_edits']  = 'JSON diff que muestra cómo el profesor modificó la propuesta IA.';
+$string['privacy:metadata:log:timecreated']    = 'Momento en que se registró la acción.';
 
 // Proveedor LLM externo (datos transferidos fuera de Moodle).
-$string['privacy:metadata:ai_subsystem']             = 'AI Grader Pro envia el texto de la entrega del alumno junto con los criterios de evaluacion del profesor al proveedor LLM configurado en el AI Subsystem de Moodle. El proveedor puede estar alojado dentro o fuera de la UE segun la eleccion de la institucion. El administrador del sitio firma un Data Processing Agreement (DPA) con el proveedor elegido.';
-$string['privacy:metadata:ai_subsystem:prompt_text'] = 'Texto de la entrega del alumno junto con los criterios e instrucciones de calificacion del profesor.';
-$string['privacy:metadata:ai_subsystem:userid']      = 'Identificador de usuario pasado al proveedor LLM para rate-limiting y prevencion de abuso (aplica la politica de privacidad del proveedor).';
+$string['privacy:metadata:ai_subsystem']             = 'AI Grader Pro envía el texto de la entrega del alumno junto con los criterios de evaluación del profesor al proveedor LLM configurado en el AI Subsystem de Moodle. El proveedor puede estar alojado dentro o fuera de la UE según la elección de la institucion. El administrador del sitio firma un Data Processing Agreement (DPA) con el proveedor elegido.';
+$string['privacy:metadata:ai_subsystem:prompt_text'] = 'Texto de la entrega del alumno junto con los criterios e instrucciones de calificación del profesor.';
+$string['privacy:metadata:ai_subsystem:userid']      = 'Identificador de usuario pasado al proveedor LLM para rate-limiting y prevención de abuso (aplica la política de privacidad del proveedor).';
 
 // Banner de errores clasificados (solo profesor, nunca al alumno).
-$string['err_banner_title']         = 'La calificacion con IA fallo';
-$string['err_banner_title_plural']  = 'La calificacion con IA fallo en {$a} entregas';
+$string['err_banner_title']         = 'La calificación con IA falló';
+$string['err_banner_title_plural']  = 'La calificación con IA falló en {$a} entregas';
 $string['err_banner_affecting']     = 'Afecta a: {$a}';
-$string['err_banner_show_details']  = 'Ver error tecnico';
+$string['err_banner_show_details']  = 'Ver error técnico';
 $string['err_banner_retry']         = 'Reintentar ahora';
 
 // Payload demasiado grande.
-$string['err_payload_too_large_headline'] = 'La entrega supera el limite del modelo';
+$string['err_payload_too_large_headline'] = 'La entrega supera el límite del modelo';
 $string['err_payload_too_large_body']     = 'La entrega ocupa {$a->requested} tokens pero el modelo configurado "{$a->model}" solo acepta {$a->limit} tokens por minuto en el plan actual.';
-$string['err_payload_too_large_body_partial'] = 'La entrega supero el limite de tokens por minuto del modelo configurado.';
-$string['err_payload_too_large_action']   = 'Cambia a un modelo con mayor limite TPM en Administracion del sitio -> IA -> Proveedores, o pide al alumno que elimine los outputs del notebook antes de volver a entregar.';
+$string['err_payload_too_large_body_partial'] = 'La entrega superó el límite de tokens por minuto del modelo configurado.';
+$string['err_payload_too_large_action']   = 'Cambia a un modelo con mayor límite TPM en Administración del sitio -> IA -> Proveedores, o pide al alumno que elimine los outputs del notebook antes de volver a entregar.';
 
 // No autorizado.
-$string['err_unauthorized_headline'] = 'El proveedor rechazo la API key';
-$string['err_unauthorized_body']     = 'El proveedor LLM devolvio un error de autenticacion. La API key no existe, es invalida o ha sido revocada.';
-$string['err_unauthorized_action']   = 'Ve a Administracion del sitio -> IA -> Proveedores y revisa la API key del proveedor activo.';
+$string['err_unauthorized_headline'] = 'El proveedor rechazó la API key';
+$string['err_unauthorized_body']     = 'El proveedor LLM devolvió un error de autenticación. La API key no existe, es inválida o ha sido revocada.';
+$string['err_unauthorized_action']   = 'Ve a Administración del sitio -> IA -> Proveedores y revisa la API key del proveedor activo.';
 
 // Rate limit.
-$string['err_rate_limited_headline'] = 'Limite de peticiones por minuto superado';
-$string['err_rate_limited_body']     = 'Se han enviado demasiadas peticiones de calificacion en poco tiempo. Moodle reintentara automaticamente con backoff exponencial.';
-$string['err_rate_limited_action']   = 'No hay nada que hacer. La calificacion se reanudara cuando se libere la cuota.';
+$string['err_rate_limited_headline'] = 'Límite de peticiones por minuto superado';
+$string['err_rate_limited_body']     = 'Se han enviado demasiadas peticiones de calificación en poco tiempo. Moodle reintentará automáticamente con backoff exponencial.';
+$string['err_rate_limited_action']   = 'No hay nada que hacer. La calificación se reanudará cuando se libere la cuota.';
 
 // Error 5xx del proveedor.
 $string['err_provider_error_headline'] = 'Error temporal del proveedor';
-$string['err_provider_error_body']     = 'El proveedor LLM devolvio un error de servidor temporal. Moodle reintentara automaticamente.';
-$string['err_provider_error_action']   = 'No hay nada que hacer. Si el problema persiste mas de 15 minutos, revisa la pagina de estado del proveedor.';
+$string['err_provider_error_body']     = 'El proveedor LLM devolvió un error de servidor temporal. Moodle reintentará automáticamente.';
+$string['err_provider_error_action']   = 'No hay nada que hacer. Si el problema persiste más de 15 minutos, revisa la página de estado del proveedor.';
 
 // Error de red.
 $string['err_network_error_headline'] = 'No se pudo conectar con el proveedor LLM';
-$string['err_network_error_body']     = 'La conexion con el proveedor LLM fallo (timeout, error de DNS o conexion rechazada).';
-$string['err_network_error_action']   = 'Revisa la conectividad de red del sitio y la URL del endpoint del proveedor. Moodle reintentara automaticamente.';
+$string['err_network_error_body']     = 'La conexión con el proveedor LLM falló (timeout, error de DNS o conexión rechazada).';
+$string['err_network_error_action']   = 'Revisa la conectividad de red del sitio y la URL del endpoint del proveedor. Moodle reintentará automáticamente.';
 
 // Error de parseo.
-$string['err_parse_error_headline'] = 'El LLM devolvio una respuesta no valida';
-$string['err_parse_error_body']     = 'El modelo produjo una salida que no se pudo parsear al formato JSON de calificacion esperado.';
-$string['err_parse_error_action']   = 'Pulsa "Reintentar ahora" para volver a llamar al modelo. Si el problema persiste, los criterios pueden estar invitando a respuestas en prosa libre; revisa los criterios de evaluacion.';
+$string['err_parse_error_headline'] = 'El LLM devolvió una respuesta no válida';
+$string['err_parse_error_body']     = 'El modelo produjo una salida que no se pudo parsear al formato JSON de calificación esperado.';
+$string['err_parse_error_action']   = 'Pulsa "Reintentar ahora" para volver a llamar al modelo. Si el problema persiste, los criterios pueden estar invitando a respuestas en prosa libre; revisa los criterios de evaluación.';
 
 // Desconocido (catch-all).
-$string['err_unknown_headline'] = 'La calificacion con IA fallo';
-$string['err_unknown_body']     = 'El proveedor devolvio un error: {$a}';
+$string['err_unknown_headline'] = 'La calificación con IA falló';
+$string['err_unknown_body']     = 'El proveedor devolvió un error: {$a}';
 $string['err_unknown_action']   = 'Consulta los detalles en el audit log y vuelve a intentarlo.';
 
 // -----------------------------------------------------------------------.

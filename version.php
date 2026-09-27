@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'local_aigrader';     // Frankenstyle name.
 // v1.1.0-beta: class report (statistics and an AI-written executive summary
 // of each assignment). See CHANGELOG.md.
-$plugin->version   = 2026092500;           // YYYYMMDDXX format.
+$plugin->version   = 2026092800;           // YYYYMMDDXX format.
 $plugin->requires  = 2024100700;           // Moodle 4.5.0 minimum.
 $plugin->maturity  = MATURITY_BETA;        // Pilot-ready.
-$plugin->release   = 'v1.1.0-beta';
+$plugin->release   = 'v1.1.1-beta';

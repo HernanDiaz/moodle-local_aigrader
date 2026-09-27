@@ -111,7 +111,7 @@ contains the teacher's `user.id`, never a system id.
   teacher decisions and audit log.
 - 🛡️ **Privacy provider** implementing GDPR Art. 15 (data export),
   Art. 17 (deletion) and the AI Act Annex III audit trail.
-- ✅ **Tested**: 140 PHPUnit tests + 18 Behat scenarios, on Moodle 4.5,
+- ✅ **Tested**: 144 PHPUnit tests + 18 Behat scenarios, on Moodle 4.5,
   5.0, 5.1 and 5.2 in CI.
 
 ## Requirements
@@ -256,7 +256,7 @@ vendor/bin/phpunit --testsuite local_aigrader_testsuite
 vendor/bin/behat --tags @local_aigrader
 ```
 
-Current status: 140 PHPUnit tests + 18 Behat scenarios, all passing.
+Current status: 144 PHPUnit tests + 18 Behat scenarios, all passing.
 
 For manual end-to-end smoke testing (after an upgrade, or during
 peer review), see [TESTPLAN.md](TESTPLAN.md) — 24 scenarios walking
@@ -280,6 +280,10 @@ strings).
 See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 Highlights:
 
+- **v1.1.1-beta** — Criterion names follow the teacher's wording and
+  language, and stay the same across the submissions of an assignment,
+  so the class report averages each criterion once. Spanish accents
+  restored in older strings.
 - **v1.1.0-beta** — Class report: statistics and an AI-written
   executive summary of how the class did on each assignment.
 - **v1.0.28-beta** — PowerPoint and OpenDocument files (also inside

@@ -146,7 +146,7 @@ EOT;
         }
 
         $user .= "=== OUTPUT FORMAT ===\n";
-        $user .= self::output_format_instructions($language);
+        $user .= self::output_format_instructions($language, self::known_criterion_keys($config));
 
         $metadata = [
             'submissionid'      => (int) $submissionid,
@@ -192,6 +192,39 @@ EOT;
     }
 
     /**
+     * Criterion keys of the assignment's latest AI proposal made since its criteria were last saved.
+     *
+     * Asking the AI to reuse them keeps one key per criterion across all the
+     * submissions of an assignment, so the class report's per-criterion averages
+     * do not split one criterion into several.
+     *
+     * @param \stdClass $config Per-assignment config row (local_aigrader_assign).
+     * @return string[] Keys in the order of that proposal; empty when there is none.
+     */
+    public static function known_criterion_keys(\stdClass $config): array {
+        global $DB;
+        // A failed regrade moves a row to "error" with a new timeprocessed but keeps its older
+        // proposal, so only rows whose proposal is current count.
+        [$statussql, $params] = $DB->get_in_or_equal(['ai_proposed', 'teacher_reviewed', 'published'], SQL_PARAMS_NAMED);
+        $rows = $DB->get_records_select(
+            'local_aigrader_submission',
+            "assignid = :assignid AND timeprocessed >= :since AND proposed_feedback IS NOT NULL AND status {$statussql}",
+            $params + ['assignid' => (int) $config->assignid, 'since' => (int) $config->timemodified],
+            'timeprocessed DESC, id DESC',
+            'id, proposed_feedback',
+            0,
+            1
+        );
+        $row = reset($rows);
+        if (!$row) {
+            return [];
+        }
+        $feedback = json_decode((string) $row->proposed_feedback, true);
+        $keys = array_map('strval', array_keys((array) ($feedback['criterion_scores'] ?? [])));
+        return array_values(array_filter($keys, fn(string $key) => trim($key) !== ''));
+    }
+
+    /**
      * Strip HTML from an assignment intro without losing paragraph breaks.
      *
      * @param string $html Raw HTML from `assign.intro`.
@@ -210,9 +243,15 @@ EOT;
      * JSON output format that the LLM must return.
      *
      * @param string $language ISO code that the LLM should write the textual fields in.
+     * @param string[] $keys Criterion keys earlier proposals of this assignment used (see known_criterion_keys()).
      * @return string Multi-line instruction block to append to the prompt.
      */
-    private static function output_format_instructions(string $language): string {
+    private static function output_format_instructions(string $language, array $keys = []): string {
+        $keyrule = '';
+        if ($keys) {
+            $keyrule = "\n- Use exactly these criterion_scores keys, in this order, as the other submissions"
+                . "\n  of this assignment do: " . implode(', ', array_map(fn(string $key) => '"' . $key . '"', $keys)) . '.';
+        }
         return <<<EOT
 Return EXCLUSIVELY a valid JSON object with this exact structure. Do not include
 any text before or after the JSON, no markdown code fences, no preamble.
@@ -234,9 +273,11 @@ Rules:
 - Compute final_grade as the weighted average of criterion_scores using the
   weights mentioned by the teacher in the criteria. If no weights are
   specified, use the simple average.
-- criterion_scores keys MUST be short slugs derived from the criteria labels
-  (lowercase, underscores, no spaces, no accents). For example "thesis_clarity"
-  instead of "Claridad de la tesis".
+- criterion_scores has one key per criterion of the teacher, in the teacher's
+  order. Each key is the teacher's own label for that criterion written as a
+  slug: the same words in the same language (never translated), lowercase,
+  underscores instead of spaces, no accents. For example "Claridad de la tesis"
+  becomes "claridad_de_la_tesis" and "Use of evidence" becomes "use_of_evidence".{$keyrule}
 - strengths and improvements MUST be specific and actionable, written in
   {$language}, referring to concrete parts of the submission when possible.
 - justification MUST be in {$language}.
