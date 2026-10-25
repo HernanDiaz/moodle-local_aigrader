@@ -7,10 +7,12 @@ edits if needed, and decides whether to publish. Nothing reaches the
 gradebook without an explicit teacher click.
 
 [![CI](https://github.com/HernanDiaz/moodle-local_aigrader/actions/workflows/moodle-ci.yml/badge.svg)](https://github.com/HernanDiaz/moodle-local_aigrader/actions/workflows/moodle-ci.yml)
-[![Tests](https://img.shields.io/badge/PHPUnit-140%20tests%20passing-brightgreen)](#tests)
+[![Tests](https://img.shields.io/badge/PHPUnit-144%20tests%20passing-brightgreen)](#tests)
 [![Code style](https://img.shields.io/badge/phpcs-0%20errors-brightgreen)](#code-quality)
 [![Languages](https://img.shields.io/badge/i18n-5%20languages-blue)](#features)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
+<!-- TODO: replace XXXXXXX with the Zenodo concept DOI once the first archived release exists. -->
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
 
 **Watch the 2-minute video demo** (English, with Spanish subtitles):
 
@@ -50,7 +52,7 @@ gradebook without an explicit teacher click.
 By design, the AI never writes a grade to the gradebook directly. The
 plugin stores its proposal in its own table (`local_aigrader_submission`)
 with status `ai_proposed`; the row only becomes `published` after the
-teacher clicks **Aprobar y publicar**. The `final_grader` column always
+teacher clicks **Approve and publish**. The `final_grader` column always
 contains the teacher's `user.id`, never a system id.
 
 ## Features
@@ -97,7 +99,7 @@ contains the teacher's `user.id`, never a system id.
   and a counter banner of clickable status chips that filter the
   view (ai_proposed / teacher_reviewed / published / problems / none).
 - 🌐 **i18n**: ships with English, Spanish, Brazilian Portuguese,
-  Catalan and French — all 194 strings, full key parity. Other
+  Catalan and French — all 250 strings, full key parity. Other
   languages welcome via PR or via AMOS once on the Plugin Directory.
 - 🎯 **Grades on the assignment's own scale**: the AI reasons on 0-10,
   the teacher sees and publishes "80 / 100" on an assignment out of
@@ -112,12 +114,12 @@ contains the teacher's `user.id`, never a system id.
 - 🛡️ **Privacy provider** implementing GDPR Art. 15 (data export),
   Art. 17 (deletion) and the AI Act Annex III audit trail.
 - ✅ **Tested**: 144 PHPUnit tests + 18 Behat scenarios, on Moodle 4.5,
-  5.0, 5.1 and 5.2 in CI.
+  5.0, 5.1, 5.2 and 5.3 in CI.
 
 ## Requirements
 
 - Moodle **4.5 LTS** or later (`$plugin->requires = 2024100700`);
-  tested on 4.5, 5.0, 5.1 and 5.2.
+  tested on 4.5, 5.0, 5.1, 5.2 and 5.3.
 - The PHP version your Moodle requires (8.1+ on 4.5, 8.3+ on 5.2).
 - An LLM provider configured through *Site administration → AI →
   Providers*. The plugin uses the `generate_text` action of the AI
@@ -130,6 +132,10 @@ contains the teacher's `user.id`, never a system id.
 
 ## Installation
 
+The [user guide](docs/user-guide.md) covers installation, provider
+setup, the whole grading flow and a complete step-by-step example for a
+test site.
+
 ### From the Moodle Marketplace (recommended)
 
 1. Download the ZIP of "AI Grader Pro" from the Moodle Marketplace.
@@ -141,8 +147,10 @@ contains the teacher's `user.id`, never a system id.
 ```bash
 cd /path/to/moodle/local
 git clone https://github.com/HernanDiaz/moodle-local_aigrader.git aigrader
-# or unzip the release ZIP into local/aigrader/
+# or unzip the ZIP of a GitHub release into local/aigrader/
 ```
+
+On Moodle 5.1 and later the plugin goes in `public/local/aigrader/`.
 
 Then visit `/admin/index.php` as a site administrator to apply the
 upgrade.
@@ -151,9 +159,13 @@ upgrade.
 
 ### 1. Pick an LLM provider
 
-Site administration → AI → Providers → enable a provider, paste the API
-key, set the default model. The plugin uses whatever the AI Subsystem
-returns; no provider lock-in.
+Site administration → General → AI → AI providers → enable a provider
+(on Moodle 5.0+, create a provider instance), paste the API key, and
+check that its **Generate text** action is enabled with the model you
+want. The plugin uses whatever the AI Subsystem returns; no provider
+lock-in. Step-by-step instructions, including Groq's free tier through
+the OpenAI provider, are in the
+[user guide](docs/user-guide.md#3-configure-an-ai-provider).
 
 ### 2. Choose where it is available (optional)
 
@@ -204,12 +216,17 @@ as the teacher who turned the option on.
 3. The plugin extracts the text, replaces the student's name, builds the
    prompt, calls the LLM, parses the response and stores the proposal
    with `status = 'ai_proposed'`.
-4. Teacher visits the **AI Grader Pro** tab, sees the list of proposals.
-5. Teacher clicks **Revisar →**, sees the LLM's grade, strengths,
+4. Teacher opens **AI Grader Pro** from the assignment's *More* menu and
+   sees the list of proposals.
+5. Teacher clicks **Review**, sees the LLM's grade, strengths,
    improvements, justification. All editable.
-6. Teacher clicks **Aprobar y publicar** — grade lands in the gradebook
+6. Teacher clicks **Approve and publish** — grade lands in the gradebook
    via `\assign::save_grade()`, `submission_graded` event fires,
-   student sees the result.
+   student sees the result. **Save without publishing** keeps the edits
+   as a draft instead.
+7. Once at least 3 submissions are graded, **Class report** shows the
+   class statistics and, with one more AI call, a summary of strengths,
+   common gaps and topics to reinforce.
 
 ## Capabilities
 
@@ -334,6 +351,29 @@ Highlights:
   retry in-place, i18n dedupe.
 - **v1.0.0-beta** — First pilot-ready release with full Privacy
   provider and Behat coverage.
+
+## Citing AI Grader Pro
+
+If you use AI Grader Pro in teaching or research, please cite it. The
+citation metadata is in [CITATION.cff](CITATION.cff), so GitHub's "Cite
+this repository" button gives APA and BibTeX versions.
+
+> Díaz Rodríguez, H. (2026). *AI Grader Pro: AI-assisted grading for
+> Moodle assignments* (Version 1.1.1-beta) [Computer software].
+> https://doi.org/10.5281/zenodo.XXXXXXX
+
+```bibtex
+@software{diazrodriguez_aigraderpro_2026,
+  author  = {Díaz Rodríguez, Hernán},
+  title   = {{AI Grader Pro: AI-assisted grading for Moodle assignments}},
+  year    = {2026},
+  version = {1.1.1-beta},
+  doi     = {10.5281/zenodo.XXXXXXX},
+  url     = {https://github.com/HernanDiaz/moodle-local_aigrader}
+}
+```
+
+<!-- TODO: replace XXXXXXX with the Zenodo concept DOI. -->
 
 ## License
 

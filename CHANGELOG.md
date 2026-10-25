@@ -5,6 +5,31 @@ here. The format follows [Keep a Changelog](https://keepachangelog.com/),
 versions follow Moodle's `YYYYMMDDXX` plugin-version convention with a
 parallel semantic-style release name.
 
+## [Unreleased]
+
+No changes to the plugin's code since v1.1.1-beta.
+
+### Documentation
+
+- New [user guide](docs/user-guide.md): installation from a ZIP or git,
+  AI provider setup on Moodle 4.5 and 5.x (including Groq through the
+  OpenAI provider), assignment criteria, grading, review, the class
+  report, and a complete step-by-step example for a test site.
+- `CITATION.cff`, `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1) and a
+  "Citing AI Grader Pro" section in the README.
+- `CONTRIBUTING.md` explains how to report issues, propose changes and
+  run the tests locally.
+- `TESTPLAN.md` uses the plugin's English strings and the current AI
+  provider settings path.
+- Test counts and supported versions are the same everywhere: 144
+  PHPUnit tests, 18 Behat scenarios, Moodle 4.5 to 5.3.
+- `paper/` holds the draft paper for the Journal of Open Source
+  Education; it is left out of the plugin ZIP.
+
+### CI
+
+- Moodle 5.3 (released) added to the test matrix, with MariaDB 11.4.
+
 ## [v1.1.1-beta] — 2026-09-28
 
 ### Fixed

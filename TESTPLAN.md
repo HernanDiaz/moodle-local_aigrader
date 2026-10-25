@@ -19,15 +19,18 @@ Before starting:
 - Site administrator account.
 - One **editing-teacher** account in a test course.
 - One **student** account enrolled in the same course.
-- An LLM provider configured in *Site administration → AI → Providers*.
+- An LLM provider configured in *Site administration → General → AI →
+  AI providers* (see the [user guide](docs/user-guide.md#3-configure-an-ai-provider)).
   Any provider exposing the `generate_text` action works. The cheapest
   way to run this test plan end-to-end is a free Groq account
   (https://console.groq.com/) plugged into the built-in `aiprovider_openai`
-  using Groq's OpenAI-compatible endpoint, with model
-  `meta-llama/llama-4-scout-17b-16e-instruct` and a 30 K TPM tier.
+  using Groq's OpenAI-compatible endpoint, with a chat model available
+  in your Groq account (for example `openai/gpt-oss-120b`).
+- The screens are described with the plugin's English strings; on a site
+  in another language, the labels are the translated ones.
 - Cron running every minute (`php admin/cli/cron.php` in a loop is fine
   for testing — the plugin also grades synchronously when the teacher
-  clicks "Calificar con IA" so cron is only strictly required if you
+  clicks "Grade with AI" so cron is only strictly required if you
   want to exercise the async path).
 
 Two helper files in the repo are useful but not required:
@@ -90,25 +93,28 @@ Two helper files in the repo are useful but not required:
 3. Scroll down to **AI Grader Pro**.
 4. **Expected**: a collapsible section labelled "AI Grader Pro" is
    present with the following controls visible when expanded:
-   - **Enable AI-assisted grading on this assignment** — checkbox.
+   - **Enable AI-assisted grading for this assignment** — checkbox.
+   - **Copy criteria from** — select with the other assignments that
+     have criteria, and a **Copy** button.
    - **Evaluation criteria** — textarea (initially empty unless an
      advanced rubric has been imported).
-   - **Model (optional)**, **Feedback language (optional)** —
-     optional override selects.
+   - **Feedback language (optional)** — select, "Auto (use course
+     language)" by default.
+   - **Grade automatically when a student submits** — checkbox.
 5. Tick the enable checkbox.
 6. Try to save the assignment **without** writing any criteria.
-7. **Expected**: form validation error — *"Los criterios de
-   evaluación son obligatorios cuando la calificación asistida por
-   IA está habilitada."*
+7. **Expected**: form validation error — *"Evaluation criteria are required when AI-assisted grading is enabled."*
 8. Paste a short criteria text such as:
    ```
-   Evalúa este ensayo (300-500 palabras) sobre el impacto social de
-   la IA según:
-   - Claridad de la tesis (40%): identificable en el primer párrafo.
-   - Calidad de las evidencias (30%): fuentes citadas.
-   - Lenguaje (30%): registro académico.
-   Tono: constructivo, en español.
+   Evaluate this essay (300-500 words) on the social impact of AI:
+   - Clarity of the thesis (40%): identifiable in the first paragraph.
+   - Quality of the evidence (30%): sources are cited.
+   - Language (30%): academic register.
+   Tone: constructive.
    ```
+
+   Criteria can be written in any language; the AI keeps the teacher's
+   wording for the criterion names.
 9. Save the assignment.
 10. **Expected**: assignment saves without errors. A row exists in
     `mdl_local_aigrader_assign` with `enabled = 1` and the
@@ -136,57 +142,55 @@ Two sub-paths exist; either is acceptable for peer review.
 
 1. Log out, log in as the **editing teacher**.
 2. Open "Test essay".
-3. Click the **AI Grader Pro** tab in the assignment's secondary nav.
+3. Open **AI Grader Pro** from the assignment's *More* menu.
 4. **Expected**: the manage page renders with the student listed
-   under status "Sin calificación IA" / "Not yet graded".
-5. Click **Calificar con IA** on the student's row.
+   under status "No AI grading yet".
+5. Click **Grade with AI** on the student's row.
 6. **Expected**: the page hangs for 2-5 seconds (synchronous LLM
-   call), then redirects with a green toast *"Calificación IA
-   completada. Pulsa Revisar para ver la propuesta."*
-7. **Expected**: the status badge has flipped to "Propuesta IA" /
-   "AI proposed" and a numeric grade is shown in the "Nota
-   propuesta" column.
+   call), then redirects with a green toast *"AI grading completed.
+   Open Revisar → to review the proposal."* (the English string still
+   names the button by its Spanish label).
+7. **Expected**: the status badge has flipped to "AI proposed" and a
+   numeric grade is shown in the "Proposed grade" column.
 
 ### 6b. Async (cron)
 
-1. Same as 6a but after step 2 click **Calificar con IA** then leave
+1. Same as 6a but after step 2 click **Grade with AI** then leave
    the page.
 2. Wait for the next cron tick.
 3. Reload manage; status is "Procesando..." while in flight,
-   "Propuesta IA" once done.
+   "AI proposed" once done.
 
 ---
 
 ## Scenario 7: Review the AI proposal (HITL gate)
 
-1. Click **Revisar** on the student's row.
+1. Click **Review** on the student's row.
 2. **Expected**: review form opens with:
    - Student's submitted files listed under "Entrega del alumno".
    - A collapsible "Entrega tal y como la vio la IA" disclosure
      showing the exact text the LLM received, with a help paragraph
      and the extracted size in KB.
-   - A "Puntuación por criterio (de la IA, informativa)" list with
+   - A "Criterion scores (from AI, for context)" list with
      per-criterion scores.
-   - Editable form fields: **Nota final**, **Aciertos**,
-     **Mejorables**, **Justificación (visible para el alumno)**, all
+   - Editable form fields: **Final grade**, **Strengths**,
+     **Improvements**, **Justification (visible to the student)**, all
      pre-filled with the AI's proposal.
-   - Three action buttons: **Aprobar y publicar** (green),
-     **Guardar sin publicar** (gray outline), and an **Atrás** link.
+   - Three action buttons: **Approve and publish** (green),
+     **Save without publishing** (gray outline), and an **Back** link.
 3. **Expected**: at the bottom, a small text-muted line reads
-   *"Propuesta hecha el `<datetime>` · por `<model name>`"*.
+   *"Proposed at `<datetime>` by `<model name>`"*.
 
 ---
 
 ## Scenario 8: Save without publishing
 
 1. Edit the grade in the form (e.g. change to 6.5).
-2. Add a line to "Aciertos" or "Mejorables".
-3. Click **Guardar sin publicar**.
-4. **Expected**: redirect to manage with toast *"Guardado sin
-   publicar. La nota no está en el cuaderno de calificaciones
-   todavía."*
-5. **Expected**: the row's status badge changes from "Propuesta IA"
-   (cyan) to "Revisada por profesor" (purple).
+2. Add a line to "Strengths" or "Improvements".
+3. Click **Save without publishing**.
+4. **Expected**: redirect to manage with toast *"Saved without publishing. The grade is not in the gradebook yet."*
+5. **Expected**: the row's status badge changes from "AI proposed"
+   (cyan) to "Teacher reviewed" (purple).
 6. **Expected**: gradebook entry for the student is empty (verify
    via *Course → Grades*).
 7. Re-open the same student's review page.
@@ -199,53 +203,49 @@ Two sub-paths exist; either is acceptable for peer review.
 ## Scenario 9: Approve and publish
 
 1. On the same student's review page, leave the form as is.
-2. Click **Aprobar y publicar**.
-3. **Expected**: redirect to manage with toast *"Nota aprobada y
-   publicada en el libro de calificaciones."*
-4. **Expected**: the row's status badge is now "Publicada" (green
-   solid), the action column shows **Ver ✓** instead of **Revisar**.
+2. Click **Approve and publish**.
+3. **Expected**: redirect to manage with toast *"Grade approved and published to the gradebook."*
+4. **Expected**: the row's status badge is now "Published" (green
+   solid), the action column shows **View ✓** instead of **Review**.
 5. Open *Course → Grades*. The student now has the grade you saved
    (e.g. 6.50).
 6. As the student, open the gradebook. The grade and feedback
-   (Aciertos, Mejorables, Justificación) are visible.
+   (Strengths, Improvements, Justification) are visible.
 
 ---
 
 ## Scenario 10: Re-grade an already-published row
 
-1. Back on the manage page as teacher, click **Calificar con IA** on
+1. Back on the manage page as teacher, click **Grade with AI** on
    the already-published row.
 2. **Expected**: a native browser `confirm()` dialog appears with
-   the message *"Esta entrega ya está publicada. ¿Recalificar con
-   IA?…"*.
+   the message *"This submission is already published. Re-grade with AI?…"*.
 3. Click OK.
 4. **Expected**: the LLM is called again, the row badge flips back
-   to "Propuesta IA". The **gradebook entry stays untouched** —
+   to "AI proposed". The **gradebook entry stays untouched** —
    verify via *Course → Grades* that the value from Scenario 9 is
    still there.
 5. Cancel the dialog instead; verify nothing changes.
 
 ---
 
-## Scenario 11: Bulk action — Publicar nota propuesta
+## Scenario 11: Bulk action — Publish proposed grade
 
 (This step expects at least 2 submissions in `ai_proposed` state.
 Have a second student submit before running it.)
 
 1. On the manage page, tick the row-level checkbox for two
    `ai_proposed` rows.
-2. In the "Con seleccionadas" dropdown, choose **Publicar nota
-   propuesta**.
-3. Click **Aplicar**.
+2. In the "With selected:" dropdown, choose **Publish proposed grade**.
+3. Click **Apply**.
 4. **Expected**: an intermediate confirmation page renders with:
-   - The action label ("Publicar nota propuesta").
+   - The action label ("Publish proposed grade").
    - A warning paragraph stating grades will be written to the
      gradebook.
-   - A count "2 entregas se procesarán."
-   - Two buttons: **Sí, publicar** and **Cancelar**.
-5. Click **Sí, publicar**.
-6. **Expected**: redirect to manage with toast *"2 entregas
-   procesadas"*. Both rows flip to "Publicada" / "Published".
+   - A count "2 submissions will be processed."
+   - Two buttons: **Yes, publish** and **Cancel**.
+5. Click **Yes, publish**.
+6. **Expected**: redirect to manage with toast *"2 submissions processed"*. Both rows flip to "Published".
 
 ---
 
@@ -254,9 +254,9 @@ Have a second student submit before running it.)
 1. Click the counter chip *"X publicadas"* above the table.
 2. **Expected**: table reloads with only `published` rows visible.
    URL gains `?filter=published`. The clicked chip gains a dark
-   border indicating it is active. A small "Mostrar todas" link
+   border indicating it is active. A small "Show all" link
    appears.
-3. Click "Mostrar todas".
+3. Click "Show all".
 4. **Expected**: filter clears, all rows are visible again.
 5. Try the other chips one by one (`ai_proposed`,
    `teacher_reviewed`, `problems`, `none`) and verify each shows
@@ -266,11 +266,10 @@ Have a second student submit before running it.)
 
 ## Scenario 13: Pagination + sorting
 
-1. With at least 10 submissions in the cohort, lower **Mostrar por
-   página** to 10.
+1. With at least 10 submissions in the cohort, lower **Show per page:** to 10.
 2. **Expected**: pagination bar renders (`1 2 »`) above and below
    the table. Only 10 rows shown.
-3. Click the "Nota propuesta" column header.
+3. Click the "Proposed grade" column header.
 4. **Expected**: rows reorder by `proposed_grade`. An arrow icon
    appears next to the header showing sort direction. URL gains
    `?tsort=grade&tdir=...`.
@@ -282,19 +281,18 @@ Have a second student submit before running it.)
 
 1. As a student in a fresh assignment, upload a single large PDF
    (>5 MB) or an image-only PDF. Submit.
-2. As the teacher, open the AI Grader Pro tab on that assignment.
-3. Click **Calificar con IA** on the row.
-4. **Expected**: status flips to "Formato no soportado" (yellow
+2. As the teacher, open AI Grader Pro from that assignment's *More* menu.
+3. Click **Grade with AI** on the row.
+4. **Expected**: status flips to "Unsupported format" (yellow
    warning badge) with a small ⓘ info icon next to it. Hovering the
    icon shows a tooltip with the explanation in the teacher's
    language (e.g. *"Todos los archivos enviados son ilegibles.
    Formatos soportados: …"*).
-5. Click **Revisar** on that row.
+5. Click **Review** on that row.
 6. **Expected**: the review form opens with an amber notice at the
-   top *"La calificación con IA no estuvo disponible para esta
-   entrega…"*, the form fields are blank (no AI proposal to
+   top *"AI grading was not available for this submission…"*, the form fields are blank (no AI proposal to
    pre-fill), and the teacher can still grade manually and publish
-   via the same **Aprobar y publicar** path.
+   via the same **Approve and publish** path.
 
 ---
 
@@ -303,18 +301,18 @@ Have a second student submit before running it.)
 The cleanest way to reproduce this in the peer-review sandbox is
 to temporarily revoke the LLM API key.
 
-1. *Site administration → AI → Providers* → blank the API key,
-   save.
-2. As the teacher, click **Calificar con IA** on any row.
+1. *Site administration → General → AI → AI providers* → blank the
+   API key, save.
+2. As the teacher, click **Grade with AI** on any row.
 3. **Expected**: row flips to "Error" (red danger badge) with the
-   ⓘ icon showing the classified reason ("El proveedor rechazó la
-   API key").
+   ⓘ icon showing the classified reason ("Provider rejected the API
+   key").
 4. **Expected**: an "AI grading failed" banner renders at the top
    of the manage page grouping all errored rows by classification
    kind, with a "Retry now" link per student and a "View raw error"
    `<details>` block.
 5. Restore the API key and click "Retry now" on the affected row.
-6. **Expected**: grading succeeds, row returns to "Propuesta IA".
+6. **Expected**: grading succeeds, row returns to "AI proposed".
 
 ---
 
