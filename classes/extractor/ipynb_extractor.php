@@ -77,6 +77,15 @@ class ipynb_extractor {
     private const MAX_TOTAL_CHARS = 40000;
 
     /**
+     * Note put before a notebook without saved outputs in the prompt. In
+     * English, like the other markers the LLM reads; the teacher gets a
+     * localised warning instead.
+     */
+    public const NO_OUTPUTS_NOTE = '[Note from AI Grader Pro: this notebook has no saved outputs. It was not run '
+        . 'before saving, or its outputs were cleared, so the file does not show whether the code runs or what '
+        . 'results it gives. Do not assume them: say so when a criterion depends on them.]';
+
+    /**
      * Extract a flat text representation from a .ipynb file.
      *
      * Thin wrapper around {@see extract_text()} that reads the file content.
@@ -144,6 +153,35 @@ class ipynb_extractor {
         $text = trim(implode("\n", $parts));
         $text = self::apply_total_cap($text);
         return $text === '' ? null : $text;
+    }
+
+    /**
+     * Whether a notebook has code but no saved outputs at all: it was not
+     * run before saving, or its outputs were cleared. Students' notebooks
+     * often arrive like this, and the LLM then sees only the code and the
+     * student's own description of the results.
+     *
+     * @param string $raw Notebook JSON.
+     * @return bool True when at least one code cell has source and no code cell has outputs.
+     */
+    public static function lacks_outputs(string $raw): bool {
+        $data = json_decode($raw, true);
+        if (!is_array($data) || !isset($data['cells']) || !is_array($data['cells'])) {
+            return false;
+        }
+        $codecells = 0;
+        foreach ($data['cells'] as $cell) {
+            if (($cell['cell_type'] ?? '') !== 'code') {
+                continue;
+            }
+            if (!empty($cell['outputs'])) {
+                return false;
+            }
+            if (trim(self::join_source($cell['source'] ?? '')) !== '') {
+                $codecells++;
+            }
+        }
+        return $codecells > 0;
     }
 
     /**

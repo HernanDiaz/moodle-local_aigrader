@@ -342,6 +342,7 @@ $string['extract_reason_zip_empty']          = 'zip (buit o només conté fitxer
 $string['extract_reason_no_extension']       = 'fitxer sense extensió';
 $string['extract_reason_unknown_extension']  = 'extensió no suportada: {$a}';
 $string['extract_truncation_warning']        = '{$a->filename} truncat a {$a->chars} caràcters';
+$string['extract_ipynb_no_outputs']          = '{$a}: el notebook no té sortides desades (no es va executar abans de desar-lo o se\'n van esborrar les sortides), així que la IA no pot veure si el codi funciona ni quins resultats dona.';
 
 // Confirmació inline en tornar a qualificar una fila ja publicada.
 $string['confirm_regrade_published'] = 'Aquest lliurament ja està publicat. Tornar a qualificar amb IA? La nota actual al quadern de qualificacions no canviarà, però l\'estat tornarà a «Proposta IA» fins que tornis a aprovar.';

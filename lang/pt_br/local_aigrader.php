@@ -342,6 +342,7 @@ $string['extract_reason_zip_empty']          = 'zip (vazio ou contém apenas arq
 $string['extract_reason_no_extension']       = 'arquivo sem extensão';
 $string['extract_reason_unknown_extension']  = 'extensão não suportada: {$a}';
 $string['extract_truncation_warning']        = '{$a->filename} truncado em {$a->chars} caracteres';
+$string['extract_ipynb_no_outputs']          = '{$a}: o notebook não tem saídas salvas (não foi executado antes de ser salvo ou as saídas foram apagadas), então a IA não consegue ver se o código funciona nem quais resultados ele dá.';
 
 // Confirmação inline ao reavaliar uma linha já publicada.
 $string['confirm_regrade_published'] = 'Este envio já está publicado. Reavaliar com IA? A nota atual no livro de notas não será alterada, mas o estado voltará a "Proposta IA" até que você aprove novamente.';

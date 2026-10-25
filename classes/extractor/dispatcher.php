@@ -237,9 +237,14 @@ class dispatcher implements extractor_interface {
         }
 
         if ($ext === 'ipynb') {
-            $text = ipynb_extractor::extract_file($file);
+            $raw  = (string) $file->get_content();
+            $text = ipynb_extractor::extract_text($raw);
             if ($text === null) {
                 return self::unsupported($filename, get_string('extract_reason_ipynb_parse', 'local_aigrader'));
+            }
+            if (ipynb_extractor::lacks_outputs($raw)) {
+                $text = ipynb_extractor::NO_OUTPUTS_NOTE . "\n\n" . $text;
+                $warnings[] = get_string('extract_ipynb_no_outputs', 'local_aigrader', $filename);
             }
             return self::wrap_simple($filename, $text, extraction_result::FORMAT_IPYNB, $warnings);
         }
