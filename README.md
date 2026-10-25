@@ -11,8 +11,7 @@ gradebook without an explicit teacher click.
 [![Code style](https://img.shields.io/badge/phpcs-0%20errors-brightgreen)](#code-quality)
 [![Languages](https://img.shields.io/badge/i18n-5%20languages-blue)](#features)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
-<!-- TODO: replace XXXXXXX with the Zenodo concept DOI once the first archived release exists. -->
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23644599.svg)](https://doi.org/10.5281/zenodo.23644599)
 
 **Watch the 2-minute video demo** (English, with Spanish subtitles):
 
@@ -364,7 +363,7 @@ this repository" button gives APA and BibTeX versions.
 
 > Díaz Rodríguez, H. (2026). *AI Grader Pro: AI-assisted grading for
 > Moodle assignments* (Version 1.1.2-beta) [Computer software].
-> https://doi.org/10.5281/zenodo.XXXXXXX
+> https://doi.org/10.5281/zenodo.23644599
 
 ```bibtex
 @software{diazrodriguez_aigraderpro_2026,
@@ -372,12 +371,10 @@ this repository" button gives APA and BibTeX versions.
   title   = {{AI Grader Pro: AI-assisted grading for Moodle assignments}},
   year    = {2026},
   version = {1.1.2-beta},
-  doi     = {10.5281/zenodo.XXXXXXX},
+  doi     = {10.5281/zenodo.23644599},
   url     = {https://github.com/HernanDiaz/moodle-local_aigrader}
 }
 ```
-
-<!-- TODO: replace XXXXXXX with the Zenodo concept DOI. -->
 
 ## License
 

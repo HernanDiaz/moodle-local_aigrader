@@ -13,7 +13,7 @@ repository-code: "https://github.com/HernanDiaz/moodle-local_aigrader"
 url: "https://marketplace.moodle.com/plugins/local_aigrader"
 version: "1.1.2-beta"
 date-released: "2026-10-25"
-# doi: add the Zenodo concept DOI here once the first release is archived.
+doi: "10.5281/zenodo.23644599"
 keywords:
   - Moodle
   - automated assessment
