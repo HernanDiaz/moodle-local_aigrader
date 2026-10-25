@@ -1,3 +1,7 @@
 # Media for the GitHub page only: keep it out of the plugin ZIP (git archive).
 /docs/media export-ignore
 /docs/media/** export-ignore
+
+# Draft paper for the Journal of Open Source Education: not part of the plugin.
+/paper export-ignore
+/paper/** export-ignore
