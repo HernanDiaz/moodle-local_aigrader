@@ -347,6 +347,7 @@ $string['extract_reason_zip_empty']          = 'zip (vacío o sólo contiene arc
 $string['extract_reason_no_extension']       = 'archivo sin extensión';
 $string['extract_reason_unknown_extension']  = 'extensión no soportada: {$a}';
 $string['extract_truncation_warning']        = '{$a->filename} truncado a {$a->chars} caracteres';
+$string['extract_ipynb_no_outputs']          = '{$a}: el notebook no tiene salidas guardadas (no se ejecutó antes de guardarlo o se borraron sus salidas), así que la IA no puede ver si el código funciona ni qué resultados da.';
 
 // Confirmación inline al re-calificar una fila ya publicada.
 $string['confirm_regrade_published'] = 'Esta entrega ya está publicada. ¿Recalificar con IA? La nota actual del cuaderno de calificaciones no cambiará, pero el estado volverá a «Propuesta IA» hasta que vuelvas a aprobar.';

@@ -342,6 +342,7 @@ $string['extract_reason_zip_empty']          = 'zip (vide ou ne contient que des
 $string['extract_reason_no_extension']       = 'fichier sans extension';
 $string['extract_reason_unknown_extension']  = 'extension non prise en charge : {$a}';
 $string['extract_truncation_warning']        = '{$a->filename} tronqué à {$a->chars} caractères';
+$string['extract_ipynb_no_outputs']          = '{$a} : le notebook n\'a pas de sorties enregistrées (il n\'a pas été exécuté avant d\'être enregistré, ou ses sorties ont été effacées), donc l\'IA ne peut pas voir si le code fonctionne ni quels résultats il donne.';
 
 // Confirmation inline en réévaluant une ligne déjà publiée.
 $string['confirm_regrade_published'] = 'Cette remise est déjà publiée. Réévaluer avec l\'IA ? La note actuelle dans le carnet de notes ne changera pas, mais l\'état reviendra à « Proposition IA » jusqu\'à ce que vous approuviez à nouveau.';

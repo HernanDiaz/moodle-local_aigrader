@@ -57,7 +57,7 @@ class manager {
             // 0. Pre-flight: short-circuit submissions where every uploaded
             // file is in an unsupported format (e.g. only a .pdf). Sending
             // those to the LLM produced false 0/10 grades in the v1.0.1
-            // pilot — Suárez's research-grade PDF project was rated 0 even
+            // pilot — a student's research-grade PDF project was rated 0 even
             // though the actual work was excellent. The dispatcher flags
             // these via is_needs_review(); we route them straight to a
             // manual-review status without burning any tokens.

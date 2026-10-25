@@ -11,7 +11,7 @@ authors:
 license: GPL-3.0-or-later
 repository-code: "https://github.com/HernanDiaz/moodle-local_aigrader"
 url: "https://marketplace.moodle.com/plugins/local_aigrader"
-version: "1.1.2-beta"
+version: "1.2.0"
 date-released: "2026-10-25"
 doi: "10.5281/zenodo.23644599"
 keywords:

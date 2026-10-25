@@ -59,7 +59,7 @@ final class ipynb_extractor_test extends \advanced_testcase {
      * Build a Keras-like verbose=1 training log with N epochs and B batches
      * per epoch. Each line is ~100 chars, so 50 epochs * 1875 batches
      * gives ~10MB of stream output — exactly the shape that hit the TPM
-     * limit on the original Pablo Barredo submission.
+     * limit on the original pilot submission.
      *
      * @param int $epochs
      * @param int $batchesperepoch
@@ -145,6 +145,87 @@ final class ipynb_extractor_test extends \advanced_testcase {
 
         $this->assertStringContainsString('[Image / rich output omitted]', $out);
         $this->assertStringNotContainsString('aGVsbG8=', $out, 'image bytes must not leak through');
+    }
+
+    // -------------------------------------------------------------------.
+    // Notebooks without saved outputs
+    // -------------------------------------------------------------------.
+
+    public function test_code_without_any_output_lacks_outputs(): void {
+        $raw = $this->notebook([
+            ['cell_type' => 'markdown', 'source' => '# Results', 'metadata' => []],
+            ['cell_type' => 'code', 'source' => 'model.fit(X, y)', 'execution_count' => null, 'outputs' => [], 'metadata' => []],
+            ['cell_type' => 'code', 'source' => 'print(acc)', 'execution_count' => null, 'outputs' => [], 'metadata' => []],
+        ]);
+
+        $this->assertTrue(ipynb_extractor::lacks_outputs($raw));
+    }
+
+    public function test_one_output_is_enough(): void {
+        $raw = $this->notebook([
+            ['cell_type' => 'code', 'source' => 'import numpy as np', 'execution_count' => 1, 'outputs' => [], 'metadata' => []],
+            [
+                'cell_type' => 'code',
+                'source' => 'print(acc)',
+                'execution_count' => 2,
+                'outputs' => [['output_type' => 'stream', 'name' => 'stdout', 'text' => '0.91']],
+                'metadata' => [],
+            ],
+        ]);
+
+        $this->assertFalse(ipynb_extractor::lacks_outputs($raw));
+    }
+
+    public function test_notebooks_without_code_do_not_lack_outputs(): void {
+        $markdownonly = $this->notebook([['cell_type' => 'markdown', 'source' => 'Only text.', 'metadata' => []]]);
+        $emptycode = $this->notebook([['cell_type' => 'code', 'source' => "  \n", 'outputs' => [], 'metadata' => []]]);
+
+        $this->assertFalse(ipynb_extractor::lacks_outputs($markdownonly));
+        $this->assertFalse(ipynb_extractor::lacks_outputs($emptycode));
+        $this->assertFalse(ipynb_extractor::lacks_outputs('{ this is not json'));
+    }
+
+    /**
+     * Through the dispatcher, a notebook without outputs reaches the prompt with
+     * a note for the AI and leaves a warning for the teacher; a notebook that was
+     * run does not.
+     *
+     * @covers \local_aigrader\extractor\dispatcher::extract
+     */
+    public function test_dispatcher_flags_notebook_without_outputs(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/assign/locallib.php');
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $module = $this->getDataGenerator()->create_module('assign', ['course' => $course->id]);
+        $context = \context_module::instance($module->cmid);
+        $submission = (new \assign($context, null, null))->get_user_submission($student->id, true);
+        $code = ['cell_type' => 'code', 'source' => 'model.fit(X, y)', 'execution_count' => null, 'outputs' => [], 'metadata' => []];
+        $file = [
+            'contextid' => $context->id,
+            'component' => 'assignsubmission_file',
+            'filearea'  => 'submission_files',
+            'itemid'    => $submission->id,
+            'filepath'  => '/',
+            'filename'  => 'lab.ipynb',
+        ];
+        $fs = get_file_storage();
+        $stored = $fs->create_file_from_string($file, $this->notebook([$code]));
+
+        $result = dispatcher::extract((int) $submission->id);
+        $this->assertTrue($result->is_ok());
+        $this->assertStringContainsString(ipynb_extractor::NO_OUTPUTS_NOTE, $result->text);
+        $this->assertContains(get_string('extract_ipynb_no_outputs', 'local_aigrader', 'lab.ipynb'), $result->warnings);
+
+        $stored->delete();
+        $code['outputs'] = [['output_type' => 'stream', 'name' => 'stdout', 'text' => 'Epoch 1/5']];
+        $fs->create_file_from_string($file, $this->notebook([$code]));
+
+        $result = dispatcher::extract((int) $submission->id);
+        $this->assertStringNotContainsString(ipynb_extractor::NO_OUTPUTS_NOTE, $result->text);
+        $this->assertSame([], $result->warnings);
     }
 
     public function test_invalid_json_returns_null(): void {
@@ -332,12 +413,12 @@ final class ipynb_extractor_test extends \advanced_testcase {
     }
 
     /**
-     * End-to-end regression: a notebook shaped like Pablo Barredo's
-     * Fashion-MNIST submission (50 epochs * 1875 batches verbose=1) used
-     * to extract to ~14k tokens. With truncation it must drop well below
-     * that, in fact well within a 10k-token budget for the prompt body.
+     * End-to-end regression: a notebook shaped like a pilot Fashion-MNIST
+     * submission (50 epochs * 1875 batches verbose=1) used to extract to
+     * ~14k tokens. With truncation it must drop well below that, in fact
+     * well within a 10k-token budget for the prompt body.
      */
-    public function test_pablo_barredo_shaped_notebook_fits_under_budget(): void {
+    public function test_fashion_mnist_shaped_notebook_fits_under_budget(): void {
         $raw = $this->notebook([
             [
                 'cell_type' => 'markdown',
@@ -383,7 +464,7 @@ final class ipynb_extractor_test extends \advanced_testcase {
 
         $this->assertNotNull($out);
         // 1 char ≈ 0.25 tokens for typical text → 40k chars ≈ 10k tokens.
-        // Realistic Pablo-shaped notebook should be well under that.
+        // A realistic notebook of this shape should be well under that.
         $this->assertLessThanOrEqual(40000, strlen($out));
 
         // The conclusion line (final accuracy on test set) must survive —

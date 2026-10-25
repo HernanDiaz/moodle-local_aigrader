@@ -63,7 +63,7 @@ git clone https://github.com/HernanDiaz/moodle-local_aigrader.git aigrader
 ```
 
 Then visit `/admin/index.php` as an administrator and upgrade. To try a
-specific release, check out its tag (for example `git checkout v1.1.2-beta`).
+specific release, check out its tag (for example `git checkout v1.2.0`).
 
 ## 3. Configure an AI provider
 
