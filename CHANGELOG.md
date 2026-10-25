@@ -5,6 +5,27 @@ here. The format follows [Keep a Changelog](https://keepachangelog.com/),
 versions follow Moodle's `YYYYMMDDXX` plugin-version convention with a
 parallel semantic-style release name.
 
+## [v1.2.0] — 2026-10-25
+
+First stable release (`MATURITY_STABLE`).
+
+### Added
+
+- **Notebooks without saved outputs are flagged.** When a Jupyter
+  notebook has code but no outputs (it was not run before saving, or its
+  outputs were cleared), the file does not show whether the code runs or
+  what it produces. The prompt now tells the AI so, and not to assume
+  those results, and the teacher sees a warning under "Submission as
+  seen by the AI". New string `extract_ipynb_no_outputs` in the five
+  languages.
+
+### Changed
+
+- Personal names removed from older changelog entries, a code comment
+  and a test name.
+- Test counts updated everywhere: 148 PHPUnit tests, 18 Behat
+  scenarios.
+
 ## [v1.1.2-beta] — 2026-10-25
 
 ### Fixed
@@ -721,20 +742,20 @@ assignments.
 ### Verification
 
 - Logged in as `prof_demo`, opened `review.php?submissionid=4`
-  (Pablo Barredo, `ai_proposed`). Typed `6.50` in the grade,
+  (a pilot submission, `ai_proposed`). Typed `6.50` in the grade,
   `"DRAFT: ediciones del profesor (test save_draft)"` in strengths,
   `"DRAFT TEST"` in justification, clicked "Guardar sin publicar".
 - Redirect lands on `manage.php?cmid=5` with toast `"Guardado sin
   publicar. La nota no está en el cuaderno de calificaciones
-  todavía."` Pablo's row badge changed from "Propuesta IA" to
+  todavía."` The row's badge changed from "Propuesta IA" to
   "Revisada por profesor" (purple).
 - Reopened `review.php?submissionid=4`. Form re-rendered with
   `6.50` in grade, the DRAFT strings in the two textareas, exactly
   what was saved. The AI's original proposal is still in
   `proposed_feedback` but not displayed — `final_*` takes
   precedence in the form pre-fill.
-- Gradebook row for Pablo: unchanged (no entry written).
-- Cleaned up the test draft (DB update reverted Pablo's row to
+- Gradebook row for that student: unchanged (no entry written).
+- Cleaned up the test draft (DB update reverted the row to
   pristine `ai_proposed` state so the demo cohort stays
   representative).
 
@@ -990,10 +1011,10 @@ assignments.
 ### Verification (live, prof_demo on course 3, cmid=5)
 
 - `?perpage=10` → 2 pages, 10 + 3 rows. Pagination bar shows `1 2 »`.
-- `?perpage=10&page=1` → page 2 shows Rodríguez Pérez, Soto
-  Rodríguez, Suárez Recio (last 3 rows).
+- `?perpage=10&page=1` → page 2 shows the last 3 rows.
 - `?tsort=grade&tdir=4` → grades sorted ascending (7.40 → 8.53).
-- `?filter=problems` → only Suárez Recio (Formato no soportado).
+- `?filter=problems` → only the submission with an unsupported
+  file (Formato no soportado).
 - All previously-working features (counter chips, bulk dropdown,
   per-row Revisar / Calificar con IA, info icon ⓘ, confirm() on
   published re-grade) still render and behave correctly.
@@ -1314,9 +1335,9 @@ assignments.
 
 ### Measured impact
 
-- Soto Rodríguez (ipynb + 776 KB PDF): grade 8.40 → 8.80 (closer to
-  teacher's 9.0). Tokens 6.7 K → 10.1 K.
-- Suárez Recio (12 MB PDF): still `needs_review` (over the 5 MB
+- A submission with a notebook and a 776 KB PDF: grade 8.40 → 8.80
+  (closer to the teacher's 9.0). Tokens 6.7 K → 10.1 K.
+- A submission with a 12 MB PDF: still `needs_review` (over the 5 MB
   safety cap). Future v1.1.0 can extend to ~50 MB via Ghostscript
   streaming.
 

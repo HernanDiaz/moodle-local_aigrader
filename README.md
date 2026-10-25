@@ -7,7 +7,7 @@ edits if needed, and decides whether to publish. Nothing reaches the
 gradebook without an explicit teacher click.
 
 [![CI](https://github.com/HernanDiaz/moodle-local_aigrader/actions/workflows/moodle-ci.yml/badge.svg)](https://github.com/HernanDiaz/moodle-local_aigrader/actions/workflows/moodle-ci.yml)
-[![Tests](https://img.shields.io/badge/PHPUnit-144%20tests%20passing-brightgreen)](#tests)
+[![Tests](https://img.shields.io/badge/PHPUnit-148%20tests%20passing-brightgreen)](#tests)
 [![Code style](https://img.shields.io/badge/phpcs-0%20errors-brightgreen)](#code-quality)
 [![Languages](https://img.shields.io/badge/i18n-5%20languages-blue)](#features)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
@@ -112,7 +112,7 @@ contains the teacher's `user.id`, never a system id.
   teacher decisions and audit log.
 - 🛡️ **Privacy provider** implementing GDPR Art. 15 (data export),
   Art. 17 (deletion) and the AI Act Annex III audit trail.
-- ✅ **Tested**: 144 PHPUnit tests + 18 Behat scenarios, on Moodle 4.5,
+- ✅ **Tested**: 148 PHPUnit tests + 18 Behat scenarios, on Moodle 4.5,
   5.0, 5.1, 5.2 and 5.3 in CI.
 
 ## Requirements
@@ -272,7 +272,7 @@ vendor/bin/phpunit --testsuite local_aigrader_testsuite
 vendor/bin/behat --tags @local_aigrader
 ```
 
-Current status: 144 PHPUnit tests + 18 Behat scenarios, all passing.
+Current status: 148 PHPUnit tests + 18 Behat scenarios, all passing.
 
 For manual end-to-end smoke testing (after an upgrade, or during
 peer review), see [TESTPLAN.md](TESTPLAN.md) — 24 scenarios walking
@@ -296,6 +296,10 @@ strings).
 See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 Highlights:
 
+- **v1.2.0** — First stable release. Jupyter notebooks without saved
+  outputs are flagged: the AI is told that the file does not show
+  whether the code runs or what it produces, and the teacher sees a
+  warning on the review page.
 - **v1.1.2-beta** — The "AI grading completed" message names the
   Review button correctly in English, Spanish and Catalan. New user
   guide, citation metadata (`CITATION.cff`), code of conduct and an
@@ -362,7 +366,7 @@ citation metadata is in [CITATION.cff](CITATION.cff), so GitHub's "Cite
 this repository" button gives APA and BibTeX versions.
 
 > Díaz Rodríguez, H. (2026). *AI Grader Pro: AI-assisted grading for
-> Moodle assignments* (Version 1.1.2-beta) [Computer software].
+> Moodle assignments* (Version 1.2.0) [Computer software].
 > https://doi.org/10.5281/zenodo.23644599
 
 ```bibtex
@@ -370,7 +374,7 @@ this repository" button gives APA and BibTeX versions.
   author  = {Díaz Rodríguez, Hernán},
   title   = {{AI Grader Pro: AI-assisted grading for Moodle assignments}},
   year    = {2026},
-  version = {1.1.2-beta},
+  version = {1.2.0},
   doi     = {10.5281/zenodo.23644599},
   url     = {https://github.com/HernanDiaz/moodle-local_aigrader}
 }

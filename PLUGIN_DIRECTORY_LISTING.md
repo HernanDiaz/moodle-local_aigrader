@@ -122,7 +122,7 @@ Nothing reaches the gradebook without an explicit teacher click.
   banner with cause, suggested action and per-student retry.
 - 🌐 **5 languages out of the box**: English, Spanish, Brazilian
   Portuguese, Catalan, French — all 250 strings, full parity.
-- ✅ **144 PHPUnit tests** + 18 Behat scenarios, all passing.
+- ✅ **148 PHPUnit tests** + 18 Behat scenarios, all passing.
 
 ### Requirements
 

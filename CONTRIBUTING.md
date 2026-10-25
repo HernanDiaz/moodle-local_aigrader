@@ -146,7 +146,7 @@ vendor/bin/behat --config <behat_dataroot>/behatrun/behat/behat.yml --tags=@loca
 vendor/bin/phpcs --standard=moodle local/aigrader
 ```
 
-The suite currently has 144 PHPUnit tests and 18 Behat scenarios; all of
+The suite currently has 148 PHPUnit tests and 18 Behat scenarios; all of
 them must pass. On Moodle 5.1 and later, paths are under `public/` (for
 example `public/local/aigrader`).
 

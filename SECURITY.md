@@ -7,13 +7,13 @@ reports are taken seriously.
 
 ## Supported versions
 
-The plugin is in beta. Security fixes are only backported to the latest
-released minor version. Older versions should be upgraded.
+Security fixes are only made for the latest released minor version.
+Older versions should be upgraded.
 
 | Version       | Supported          |
 |---------------|--------------------|
-| `v1.0.x`      | ✅ (latest minor)  |
-| earlier betas | ❌ (please upgrade)|
+| `v1.2.x`      | ✅ (latest minor)  |
+| earlier       | ❌ (please upgrade)|
 
 The plugin requires Moodle 4.5 LTS (build `2024100700`) or later. If a
 vulnerability is found that only reproduces on an unsupported Moodle
