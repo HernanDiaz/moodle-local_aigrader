@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use AI Grader Pro, please cite it as below."
+type: software
+title: "AI Grader Pro: AI-assisted grading for Moodle assignments"
+abstract: "Moodle local plugin that proposes per-criterion grades and structured feedback for assignments using the Moodle AI subsystem. The teacher reviews and decides; nothing reaches the gradebook without an explicit teacher action. Provider-agnostic, with student anonymisation and an audit trail."
+authors:
+  - family-names: "Díaz Rodríguez"
+    given-names: "Hernán"
+    orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO: ORCID
+    affiliation: "University of Oviedo"
+license: GPL-3.0-or-later
+repository-code: "https://github.com/HernanDiaz/moodle-local_aigrader"
+url: "https://marketplace.moodle.com/plugins/local_aigrader"
+version: "1.1.1-beta"
+date-released: "2026-09-28"
+doi: "10.5281/zenodo.XXXXXXX"   # TODO: DOI de concepto de Zenodo
+keywords:
+  - Moodle
+  - automated assessment
+  - large language models
+  - educational technology

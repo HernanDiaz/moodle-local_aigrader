@@ -121,20 +121,20 @@ Nothing reaches the gradebook without an explicit teacher click.
   auth failure, network error, parse error — each gets a localised
   banner with cause, suggested action and per-student retry.
 - 🌐 **5 languages out of the box**: English, Spanish, Brazilian
-  Portuguese, Catalan, French — all 194 strings, full parity.
-- ✅ **85 PHPUnit tests** + 2 Behat scenarios, all passing.
+  Portuguese, Catalan, French — all 250 strings, full parity.
+- ✅ **144 PHPUnit tests** + 18 Behat scenarios, all passing.
 
 ### Requirements
 
 - Moodle **4.5 LTS** or later.
-- PHP **8.2** or later.
+- The PHP version your Moodle requires (**8.1** or later on Moodle 4.5).
 - An LLM provider configured in
-  *Site administration → AI → Providers*.
+  *Site administration → General → AI → AI providers*.
 
 ### Quick start
 
 1. Install the plugin from this Directory listing.
-2. *Site administration → AI → Providers* — enable one (OpenAI is
+2. *Site administration → General → AI → AI providers* — enable one (OpenAI is
    the easiest if you have an API key; Groq is the cheapest).
 3. Open any assignment → edit → expand "AI Grader Pro" → tick
    "Enable" and paste evaluation criteria in plain prose. Save.
@@ -170,11 +170,11 @@ your behalf.
 
 | Code | Language | Coverage |
 |---|---|---|
-| `en` | English | 194 / 194 strings |
-| `es` | Spanish (universal) | 194 / 194 |
-| `pt_br` | Brazilian Portuguese | 194 / 194 |
-| `ca` | Catalan | 194 / 194 |
-| `fr` | French (European) | 194 / 194 |
+| `en` | English | 250 / 250 strings |
+| `es` | Spanish (universal) | 250 / 250 |
+| `pt_br` | Brazilian Portuguese | 250 / 250 |
+| `ca` | Catalan | 250 / 250 |
+| `fr` | French (European) | 250 / 250 |
 
 Contributions for additional languages welcome — either as a PR to
 the repository, or once the plugin lands in the Directory, via the
@@ -202,5 +202,5 @@ bullets. For the **first** submission, use this:
 > for `mod_assign` with human-in-the-loop guarantees. Multi-LLM via
 > the Moodle AI Subsystem, multi-language (en / es / pt_br / ca / fr),
 > paginated manage page, bulk actions, classified error banner, full
-> Privacy provider including the EU AI Act Annex III audit trail. 85
-> PHPUnit tests, 0 phpcs errors.
+> Privacy provider including the EU AI Act Annex III audit trail.
+> PHPUnit and Behat test suites, 0 phpcs errors.

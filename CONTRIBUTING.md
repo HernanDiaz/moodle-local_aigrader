@@ -20,6 +20,32 @@ Read this once before opening a PR — it'll save you a round-trip.
    release tags.
 7. Open the PR against `main`. CI must pass.
 
+## Reporting issues
+
+Open an issue at
+https://github.com/HernanDiaz/moodle-local_aigrader/issues/new/choose
+and pick a template:
+
+- **Bug report**: what you did, what you expected and what happened.
+  Include the Moodle version, the plugin version (*Site administration
+  → Plugins → Plugins overview*), the database, the AI provider and
+  model, and the error banner or the debugging message, if any. Remove
+  API keys and student data from logs and screenshots.
+- **Feature request**: the teaching or admin problem it solves, not only
+  the feature you have in mind.
+- **Security problems**: do **not** open a public issue; follow
+  [SECURITY.md](SECURITY.md).
+
+## Proposing changes
+
+1. For anything beyond a small fix, open an issue first so we can agree
+   on the approach (see "Ground rules" below).
+2. Fork the repository, create a branch from `main` and keep the change
+   focused on one thing.
+3. Add or update tests, run the checks below, and open a pull request
+   against `main`. The pull request template lists what reviewers look
+   for; CI runs on every pull request.
+
 ## Ground rules
 
 ### What we accept
@@ -97,6 +123,33 @@ Note: contributors don't need to test against a real OpenAI key. The
 plugin's tests use a mock AI provider; you only need real credentials
 for end-to-end smoke testing (see `TESTPLAN.md`).
 
+### Running the tests locally
+
+Without `moodle-plugin-ci`, from the Moodle root of a development site
+with `$CFG->phpunit_prefix`, `$CFG->phpunit_dataroot` (and, for Behat,
+`$CFG->behat_wwwroot`, `$CFG->behat_prefix`, `$CFG->behat_dataroot`) set
+in `config.php`:
+
+```bash
+# PHPUnit: initialise once (and again after a version bump), then run the suite.
+php admin/tool/phpunit/cli/init.php
+vendor/bin/phpunit --testsuite local_aigrader_testsuite
+
+# One test file.
+vendor/bin/phpunit local/aigrader/tests/output_parser_test.php
+
+# Behat: initialise once, then run the plugin's scenarios (needs Selenium/Chrome).
+php admin/tool/behat/cli/init.php
+vendor/bin/behat --config <behat_dataroot>/behatrun/behat/behat.yml --tags=@local_aigrader
+
+# Coding style, as in CI.
+vendor/bin/phpcs --standard=moodle local/aigrader
+```
+
+The suite currently has 144 PHPUnit tests and 18 Behat scenarios; all of
+them must pass. On Moodle 5.1 and later, paths are under `public/` (for
+example `public/local/aigrader`).
+
 ## Coding style
 
 - **PHP**: Moodle coding style, full stop. Run
@@ -125,10 +178,10 @@ PRs without tests for new behaviour are unlikely to be merged.
   follow Moodle conventions, use `resetAfterTest(true)`.
 - **Behat scenarios** under `tests/behat/` for UI changes. Tag
   with `@javascript` when JS is involved.
-- We run **PHPUnit + Behat** in CI across PHP 8.1/8.2/8.3 and
-  Moodle 4.5 / 5.0 (matrix in `.github/workflows/moodle-ci.yml`).
-  If your change is incompatible with one cell of the matrix,
-  document it.
+- We run **PHPUnit + Behat** in CI across PHP 8.1 to 8.4, Moodle 4.5
+  to 5.3 (plus `main`, allowed to fail), PostgreSQL and MariaDB (matrix
+  in `.github/workflows/moodle-ci.yml`). If your change is incompatible
+  with one cell of the matrix, document it.
 
 ## Translations
 
@@ -154,9 +207,8 @@ Look at `git log --oneline -20` for the house style. In short:
   page spacing — Moove drops Bootstrap gap-* utilities").
 - Body wraps at ~72 chars. Explain *why*, not just *what*.
 - Include the version tag when bumping (e.g. "(v1.0.16-beta)").
-- We sign off Claude commits with `Co-Authored-By: Claude Opus 4.7
-  (1M context) <noreply@anthropic.com>`. Human-only commits don't
-  need that line.
+- Commits written with an AI assistant carry a `Co-Authored-By:` line
+  naming it. Human-only commits don't need that line.
 
 ## Pull request checklist
 
@@ -180,20 +232,21 @@ For reference, releases happen on tagged commits:
 3. `git tag -a v1.0.N-beta -m "v1.0.N-beta — short summary"`.
 4. `git push --follow-tags origin main`.
 5. CI runs, must be green.
-6. Plugin Directory ZIP is generated from the tag.
+6. The Moodle Marketplace ZIP is generated from the tag.
 
 ## Code of Conduct
 
-Be kind, be concise, assume good faith. We're all working on a small
-plugin that ends up touching real teachers' real grading workloads.
-Reviews are about the code, not the contributor.
+This project follows the [Contributor Covenant 2.1](CODE_OF_CONDUCT.md).
+In short: be kind, be concise, assume good faith. We're all working on a
+small plugin that ends up touching real teachers' real grading
+workloads. Reviews are about the code, not the contributor.
 
 If something feels off in a review thread, ping the maintainer
 privately (`hernan@aigraderpro.com`) — they will mediate.
 
 ## Questions?
 
-- **General**: open a Discussion on GitHub.
+- **General**: open a GitHub issue.
 - **Bug reports**: GitHub issue with the bug-report template.
 - **Feature ideas**: GitHub issue with the feature-request template.
 - **Security**: see `SECURITY.md` (do **not** open public issues).
