@@ -8,7 +8,8 @@ tags:
   - PHP
   - privacy
 authors:
-  - name: Hernán Díaz Rodríguez
+  - given-names: Hernán
+    surname: Díaz Rodríguez
     orcid: 0000-0003-2615-0042
     affiliation: 1
 affiliations:
@@ -22,7 +23,7 @@ bibliography: paper.bib
 
 AI Grader Pro is a free, open-source plugin (GPL-3.0-or-later) for the Moodle learning management system that adds AI-assisted grading to the standard *Assignment* activity. For each submission, a large language model (LLM) proposes a grade per assessment criterion and a structured piece of feedback; the teacher reviews, edits and decides. Nothing reaches the gradebook without an explicit teacher action, even when proposals are prepared automatically on submission (an option, off by default).
 
-The plugin is built on Moodle's native AI subsystem [@MoodleAISubsystem] (Moodle 4.5 and later), so institutions can use whichever LLM provider they have already configured (OpenAI, Azure OpenAI, Groq and others) without vendor lock-in or additional credentials. It handles essays and documents (PDF, Word .docx, PowerPoint .pptx, OpenDocument text and presentations, Markdown and plain text), source code in 24 file types (Python, Java, C/C++, SQL and others), Jupyter notebooks and ZIP projects. By default, student identifiers are replaced by placeholders before every call to the model, every proposal and decision is written to an audit trail, and a class report offers anonymised statistics for the teacher. The interface is available in English, Spanish, Brazilian Portuguese, Catalan and French.
+The plugin is built on the AI subsystem introduced in Moodle 4.5 [@MoodleAISubsystem], so institutions can use whichever LLM provider they have already configured (OpenAI, Azure OpenAI, Groq and others) without vendor lock-in or additional credentials. It handles essays and documents (PDF, Word .docx, PowerPoint .pptx, OpenDocument text and presentations, Markdown and plain text), source code in 24 file types (Python, Java, C/C++, SQL and others), Jupyter notebooks and ZIP projects. By default, student identifiers are replaced by placeholders before every call to the model, every proposal and decision is written to an audit trail, and a class report offers anonymised statistics for the teacher. The interface is available in English, Spanish, Brazilian Portuguese, Catalan and French.
 
 AI Grader Pro is distributed through the Moodle Marketplace, Moodle's official plugin directory, and, as of October 2026, is installed on 53 Moodle sites. Its source code is archived on Zenodo [@AIGraderProZenodo].
 
