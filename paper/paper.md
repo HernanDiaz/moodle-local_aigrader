@@ -23,7 +23,7 @@ bibliography: paper.bib
 
 AI Grader Pro is a free, open-source plugin (GPL-3.0-or-later) for the Moodle learning management system that adds AI-assisted grading to the standard *Assignment* activity. For each submission, a large language model (LLM) proposes a grade per assessment criterion and a structured piece of feedback; the teacher reviews, edits and decides. Nothing reaches the gradebook without an explicit teacher action, even when proposals are prepared automatically on submission (an option, off by default).
 
-The plugin is built on the AI subsystem introduced in Moodle 4.5 [@MoodleAISubsystem], so institutions can use whichever LLM provider they have already configured (OpenAI, Azure OpenAI, Groq and others) without vendor lock-in or additional credentials. It reads documents (PDF, Word, PowerPoint, OpenDocument, Markdown), source code in 24 file types, Jupyter notebooks and ZIP projects, and a class report summarises each assignment for the teacher. The interface is available in five languages.
+The plugin is built on the AI subsystem introduced in Moodle 4.5 [@MoodleAISubsystem], so institutions can use whichever LLM provider they have already configured (OpenAI, Azure OpenAI, Groq and others) without vendor lock-in or additional credentials. It reads documents (PDF, Word, PowerPoint, OpenDocument, Markdown), source code in 24 file types, Jupyter notebooks and ZIP projects, and a class report summarises each assignment for the teacher. The interface is available in five languages, and in Mexican Spanish through Moodle's community translation system.
 
 AI Grader Pro is distributed through the Moodle Marketplace, Moodle's official plugin directory. Its source code is archived on Zenodo [@AIGraderProZenodo].
 
