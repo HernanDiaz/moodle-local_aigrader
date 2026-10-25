@@ -9,7 +9,7 @@ tags:
   - privacy
 authors:
   - name: Hernán Díaz Rodríguez
-    orcid: 0000-0000-0000-0000  # TODO: ORCID
+    orcid: 0000-0003-2615-0042
     affiliation: 1
 affiliations:
   - name: Department of Computer Science, University of Oviedo, Spain
