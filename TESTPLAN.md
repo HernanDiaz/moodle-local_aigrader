@@ -147,9 +147,8 @@ Two sub-paths exist; either is acceptable for peer review.
    under status "No AI grading yet".
 5. Click **Grade with AI** on the student's row.
 6. **Expected**: the page hangs for 2-5 seconds (synchronous LLM
-   call), then redirects with a green toast *"AI grading completed.
-   Open Revisar → to review the proposal."* (the English string still
-   names the button by its Spanish label).
+   call), then redirects with a green toast *"AI grading completed. Click Review
+   to see the proposal."*
 7. **Expected**: the status badge has flipped to "AI proposed" and a
    numeric grade is shown in the "Proposed grade" column.
 

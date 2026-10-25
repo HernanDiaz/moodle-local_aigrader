@@ -297,6 +297,10 @@ strings).
 See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 Highlights:
 
+- **v1.1.2-beta** — The "AI grading completed" message names the
+  Review button correctly in English, Spanish and Catalan. New user
+  guide, citation metadata (`CITATION.cff`), code of conduct and an
+  English test plan.
 - **v1.1.1-beta** — Criterion names follow the teacher's wording and
   language, and stay the same across the submissions of an assignment,
   so the class report averages each criterion once. Spanish accents
@@ -359,7 +363,7 @@ citation metadata is in [CITATION.cff](CITATION.cff), so GitHub's "Cite
 this repository" button gives APA and BibTeX versions.
 
 > Díaz Rodríguez, H. (2026). *AI Grader Pro: AI-assisted grading for
-> Moodle assignments* (Version 1.1.1-beta) [Computer software].
+> Moodle assignments* (Version 1.1.2-beta) [Computer software].
 > https://doi.org/10.5281/zenodo.XXXXXXX
 
 ```bibtex
@@ -367,7 +371,7 @@ this repository" button gives APA and BibTeX versions.
   author  = {Díaz Rodríguez, Hernán},
   title   = {{AI Grader Pro: AI-assisted grading for Moodle assignments}},
   year    = {2026},
-  version = {1.1.1-beta},
+  version = {1.1.2-beta},
   doi     = {10.5281/zenodo.XXXXXXX},
   url     = {https://github.com/HernanDiaz/moodle-local_aigrader}
 }

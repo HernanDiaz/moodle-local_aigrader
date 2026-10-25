@@ -101,8 +101,8 @@ $string['manage_no_submissions']    = 'Encara no hi ha lliuraments per a aquesta
 $string['manage_polling']           = 'Una qualificació està en curs. Aquesta pàgina s\'actualitzarà automàticament.';
 $string['manage_back_to_assignment'] = '← Torna a la tasca';
 $string['msg_enqueued']             = 'Tasca de qualificació IA encolada. S\'executarà al pròxim cron.';
-$string['msg_graded_now']           = 'Qualificació IA completada. Prem Revisar per veure la proposta.';
-$string['msg_needs_manual_review']  = 'La IA no ha pogut processar aquest lliurament automàticament. Prem Revisar per qualificar manualment.';
+$string['msg_graded_now']           = 'Qualificació IA completada. Prem Revisa per veure la proposta.';
+$string['msg_needs_manual_review']  = 'La IA no ha pogut processar aquest lliurament automàticament. Prem Revisa per qualificar manualment.';
 
 $string['th_student']   = 'Alumne';
 $string['th_submitted'] = 'Lliurat';

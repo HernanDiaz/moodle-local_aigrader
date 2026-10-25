@@ -103,8 +103,8 @@ $string['manage_no_submissions']    = 'No submitted assignments yet for this tas
 $string['manage_polling']           = 'A grading task is in progress. This page will refresh automatically.';
 $string['manage_back_to_assignment'] = '← Back to the assignment';
 $string['msg_enqueued']             = 'AI grading task enqueued. It will run on the next cron tick.';
-$string['msg_graded_now']           = 'AI grading completed. Open Revisar → to review the proposal.';
-$string['msg_needs_manual_review']  = 'AI could not process this submission automatically. Open Revisar → to grade it manually.';
+$string['msg_graded_now']           = 'AI grading completed. Click Review to see the proposal.';
+$string['msg_needs_manual_review']  = 'AI could not process this submission automatically. Click Review to grade it manually.';
 
 $string['th_student']   = 'Student';
 $string['th_submitted'] = 'Submitted';

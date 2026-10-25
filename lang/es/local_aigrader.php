@@ -103,8 +103,8 @@ $string['manage_no_submissions']    = 'Aún no hay entregas para esta tarea.';
 $string['manage_polling']           = 'Una calificación está en proceso. Esta página se actualizará automáticamente.';
 $string['manage_back_to_assignment'] = '← Volver a la tarea';
 $string['msg_enqueued']             = 'Tarea de calificación IA encolada. Se ejecutará en el próximo cron.';
-$string['msg_graded_now']           = 'Calificación IA completada. Pulsa Revisar → para ver la propuesta.';
-$string['msg_needs_manual_review']  = 'La IA no pudo procesar esta entrega automáticamente. Pulsa Revisar → para calificar a mano.';
+$string['msg_graded_now']           = 'Calificación IA completada. Pulsa Revisar para ver la propuesta.';
+$string['msg_needs_manual_review']  = 'La IA no pudo procesar esta entrega automáticamente. Pulsa Revisar para calificar a mano.';
 
 $string['th_student']   = 'Alumno';
 $string['th_submitted'] = 'Entregado';

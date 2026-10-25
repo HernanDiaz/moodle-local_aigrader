@@ -5,9 +5,17 @@ here. The format follows [Keep a Changelog](https://keepachangelog.com/),
 versions follow Moodle's `YYYYMMDDXX` plugin-version convention with a
 parallel semantic-style release name.
 
-## [Unreleased]
+## [v1.1.2-beta] — 2026-10-25
 
-No changes to the plugin's code since v1.1.1-beta.
+### Fixed
+
+- After **Grade with AI**, the confirmation message pointed to a button
+  that does not exist on an English site ("Open Revisar → to review the
+  proposal"). It now says "Click Review to see the proposal", and the
+  "could not process this submission" message says "Click Review to
+  grade it manually". The Spanish messages lose an arrow the button no
+  longer has, and the Catalan ones name the button as it is labelled
+  ("Revisa").
 
 ### Documentation
 
