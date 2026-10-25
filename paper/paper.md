@@ -25,7 +25,7 @@ AI Grader Pro is a free, open-source plugin (GPL-3.0-or-later) for the Moodle le
 
 The plugin is built on the AI subsystem introduced in Moodle 4.5 [@MoodleAISubsystem], so institutions can use whichever LLM provider they have already configured (OpenAI, Azure OpenAI, Groq and others) without vendor lock-in or additional credentials. It handles essays and documents (PDF, Word .docx, PowerPoint .pptx, OpenDocument text and presentations, Markdown and plain text), source code in 24 file types (Python, Java, C/C++, SQL and others), Jupyter notebooks and ZIP projects. By default, student identifiers are replaced by placeholders before every call to the model, every proposal and decision is written to an audit trail, and a class report offers anonymised statistics for the teacher. The interface is available in English, Spanish, Brazilian Portuguese, Catalan and French.
 
-AI Grader Pro is distributed through the Moodle Marketplace, Moodle's official plugin directory, and, as of October 2026, is installed on 53 Moodle sites. Its source code is archived on Zenodo [@AIGraderProZenodo].
+AI Grader Pro is distributed through the Moodle Marketplace, Moodle's official plugin directory. Its source code is archived on Zenodo [@AIGraderProZenodo].
 
 # Statement of need
 
@@ -44,6 +44,8 @@ AI Grader Pro grew out of the author's own teaching. Students worked through gui
 # Use in teaching
 
 The plugin was piloted at the University of Oviedo in the second semester of the 2025/2026 academic year (January to May 2026), in the lab sessions of two technical courses, Databases and Programming, with about 30 students in total, whose lab deliverables were graded with AI Grader Pro. All of them passed, a higher pass rate than in previous years; the pilot was not designed as a controlled study, so this cannot be attributed to the plugin alone. It was also used in a microcredential on artificial intelligence with 15 students, of whom 14 submitted the lab assignments, and all 14 passed.
+
+Beyond these courses, the Moodle Marketplace statistics show the plugin installed on 53 Moodle sites in October 2026, up from 15 in April, and 247 downloads between June and September 2026.
 
 # Design and implementation
 
